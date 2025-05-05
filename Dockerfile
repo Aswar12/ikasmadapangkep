@@ -9,6 +9,8 @@ RUN apt-get update && apt-get install -y \
     libxml2-dev \
     zip \
     unzip \
+    python3-dev \
+    python3-pip \
     libzip-dev \
     libicu-dev \
     nodejs \
