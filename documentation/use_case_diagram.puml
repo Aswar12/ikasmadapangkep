@@ -1,0 +1,123 @@
+```plantuml
+@startuml IKA_SMADA_Pangkep_Use_Case_Diagram
+
+' Actors
+actor "Admin" as admin
+actor "Alumni" as alumni
+actor "Koordinator Angkatan" as koordinator
+actor "Ketua Departemen" as ketuadept
+actor "Bendahara" as bendahara
+actor "Sekretaris" as sekretaris
+actor "Ketua Umum" as ketuaumum
+
+' Use cases
+rectangle "Sistem Informasi IKA SMADA Pangkep" {
+  ' Authentication use cases
+  usecase "Login" as UC1
+  usecase "Register" as UC2
+  usecase "Reset Password" as UC3
+  usecase "Verify Email" as UC4
+  
+  ' Profile management
+  usecase "Manage Profile" as UC5
+  usecase "Update Alumni Status" as UC6
+  usecase "Search Alumni" as UC7
+  
+  ' Organization management
+  usecase "Manage Departments" as UC8
+  usecase "Manage Program Kerja" as UC9
+  usecase "Track Program Progress" as UC10
+  usecase "Manage Year Groups" as UC11
+  
+  ' Event management
+  usecase "Create Event" as UC12
+  usecase "Register for Event" as UC13
+  usecase "Manage Participants" as UC14
+  
+  ' Finance management
+  usecase "Pay Annual Fee" as UC15
+  usecase "Verify Payment" as UC16
+  usecase "Manage Cash Flow" as UC17
+  usecase "Generate Financial Report" as UC18
+  
+  ' Document management
+  usecase "Upload Document" as UC19
+  usecase "Manage Document Access" as UC20
+  usecase "Download Document" as UC21
+  
+  ' Gallery management
+  usecase "Create Album" as UC22
+  usecase "Upload Photos" as UC23
+  usecase "Tag Alumni in Photos" as UC24
+  
+  ' MUBES management
+  usecase "Schedule MUBES" as UC25
+  usecase "Record MUBES Decisions" as UC26
+  usecase "Generate AD/ART" as UC27
+  
+  ' Communication
+  usecase "Send Notifications" as UC28
+  usecase "Create Letter" as UC29
+  usecase "Manage Mail Archive" as UC30
+}
+
+' Relationships
+admin --> UC1
+alumni --> UC1
+koordinator --> UC1
+ketuadept --> UC1
+bendahara --> UC1
+sekretaris --> UC1
+ketuaumum --> UC1
+
+alumni --> UC2
+alumni --> UC3
+alumni --> UC4
+alumni --> UC5
+alumni --> UC6
+alumni --> UC7
+alumni --> UC13
+alumni --> UC15
+alumni --> UC21
+alumni --> UC23
+
+admin --> UC5
+admin --> UC7
+admin --> UC8
+admin --> UC11
+admin --> UC16
+admin --> UC20
+admin --> UC25
+admin --> UC28
+admin --> UC30
+
+koordinator --> UC5
+koordinator --> UC7
+koordinator --> UC11
+koordinator --> UC14
+koordinator --> UC22
+koordinator --> UC23
+koordinator --> UC24
+
+ketuadept --> UC9
+ketuadept --> UC10
+ketuadept --> UC12
+ketuadept --> UC19
+
+bendahara --> UC16
+bendahara --> UC17
+bendahara --> UC18
+
+sekretaris --> UC20
+sekretaris --> UC29
+sekretaris --> UC30
+
+ketuaumum --> UC8
+ketuaumum --> UC9
+ketuaumum --> UC25
+ketuaumum --> UC26
+ketuaumum --> UC27
+ketuaumum --> UC28
+
+@enduml
+```

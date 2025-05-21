@@ -1,0 +1,49 @@
+# Contoh Struktur Dasar Untuk Diagram Use Case di Excalidraw
+
+```
+System Boundary: Sistem Informasi IKA SMADA Pangkep
+------------------
+Actors:
+- Admin
+- Alumni
+- Koordinator Angkatan
+- Ketua Departemen
+- Bendahara
+------------------
+Use Cases:
+- Login
+- Register
+- Manage Profile
+- Update Alumni Status
+- Search Alumni
+- Manage Departments
+- Manage Program Kerja
+- etc.
+```
+
+# Hubungan Actor-Use Case
+
+Admin ─────────────► Manage Users
+
+Alumni ─────────────► Update Profile
+
+Koordinator Angkatan ─────────────► Manage Year Group
+
+# Hubungan Antar Use Case
+
+Login <<include>> Authenticate User
+
+Create Event <<extend>> Manage Program Kerja
+
+# Langkah-Langkah Pembuatan Diagram Use Case
+
+1. Buat rectangle besar dengan rounded corners sebagai system boundary
+2. Buat stick figure untuk setiap actor di luar boundary
+3. Buat oval untuk setiap use case di dalam boundary
+4. Connect actor dengan use case menggunakan garis lurus
+5. Connect antar use case dengan garis putus-putus dan label (<<include>>, <<extend>>)
+
+# Catatan:
+- Fokus pada fungsionalitas sistem dari sudut pandang pengguna
+- Nama use case sebaiknya menggunakan kata kerja
+- Diagram use case berfungsi untuk komunikasi dengan stakeholder

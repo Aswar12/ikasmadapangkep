@@ -1,0 +1,247 @@
+```plantuml
+@startuml IKA_SMADA_Pangkep_Class_Diagram
+
+' Main classes
+class User {
+  +id: bigint
+  +name: string
+  +email: string
+  +email_verified_at: timestamp
+  +password: string
+  +role: enum
+  +graduation_year: string
+  +active: boolean
+  +phone: string
+  +remember_token: string
+  +created_at: timestamp
+  +updated_at: timestamp
+  +authenticate()
+  +updateProfile()
+}
+
+class Profile {
+  +id: bigint
+  +user_id: bigint
+  +gender: string
+  +birth_place: string
+  +birth_date: date
+  +address: text
+  +father_name: string
+  +mother_name: string
+  +entry_year: string
+  +graduation_year: string
+  +diploma_number: string
+  +profile_photo: string
+  +created_at: timestamp
+  +updated_at: timestamp
+  +updateInfo()
+  +uploadPhoto()
+}
+
+class AlumniStatus {
+  +id: bigint
+  +user_id: bigint
+  +status: enum
+  +company_name: string
+  +position: string
+  +institution_name: string
+  +education_level: string
+  +business_name: string
+  +created_at: timestamp
+  +updated_at: timestamp
+  +updateStatus()
+}
+
+class Department {
+  +id: bigint
+  +name: string
+  +description: text
+  +coordinator_id: bigint
+  +created_at: timestamp
+  +updated_at: timestamp
+  +createProgram()
+  +assignCoordinator()
+}
+
+class ProgramKerja {
+  +id: bigint
+  +department_id: bigint
+  +name: string
+  +description: text
+  +start_date: date
+  +end_date: date
+  +location: string
+  +budget: decimal
+  +person_in_charge: bigint
+  +status: enum
+  +progress_percentage: integer
+  +created_at: timestamp
+  +updated_at: timestamp
+  +updateProgress()
+  +generateReport()
+}
+
+class Group {
+  +id: bigint
+  +name: string
+  +description: text
+  +graduation_year: string
+  +coordinator_id: bigint
+  +created_at: timestamp
+  +updated_at: timestamp
+  +addMember()
+  +assignCoordinator()
+}
+
+class UserGroup {
+  +id: bigint
+  +user_id: bigint
+  +group_id: bigint
+  +role: enum
+  +created_at: timestamp
+  +updated_at: timestamp
+}
+
+class UserDepartment {
+  +id: bigint
+  +user_id: bigint
+  +department_id: bigint
+  +role: enum
+  +created_at: timestamp
+  +updated_at: timestamp
+}
+
+class Event {
+  +id: bigint
+  +department_id: bigint
+  +title: string
+  +description: text
+  +start_date: datetime
+  +end_date: datetime
+  +location: string
+  +max_participants: integer
+  +registration_fee: decimal
+  +is_published: boolean
+  +created_at: timestamp
+  +updated_at: timestamp
+  +publish()
+  +registerParticipant()
+}
+
+class EventRegistration {
+  +id: bigint
+  +event_id: bigint
+  +user_id: bigint
+  +status: enum
+  +payment_proof: string
+  +is_paid: boolean
+  +created_at: timestamp
+  +updated_at: timestamp
+  +confirmPayment()
+  +updateStatus()
+}
+
+class Payment {
+  +id: bigint
+  +user_id: bigint
+  +payment_year: string
+  +amount: decimal
+  +payment_method: string
+  +proof_file: string
+  +status: enum
+  +verified_by: bigint
+  +verified_at: timestamp
+  +created_at: timestamp
+  +updated_at: timestamp
+  +verify()
+  +reject()
+}
+
+class Document {
+  +id: bigint
+  +title: string
+  +description: text
+  +department_id: bigint
+  +file_path: string
+  +file_type: string
+  +uploaded_by: bigint
+  +is_public: boolean
+  +current_version: integer
+  +created_at: timestamp
+  +updated_at: timestamp
+  +download()
+  +share()
+}
+
+class Gallery {
+  +id: bigint
+  +title: string
+  +description: text
+  +created_by: bigint
+  +event_name: string
+  +graduation_year: string
+  +is_public: boolean
+  +created_at: timestamp
+  +updated_at: timestamp
+  +uploadPhotos()
+  +tagAlumni()
+}
+
+class Photo {
+  +id: bigint
+  +gallery_id: bigint
+  +file_path: string
+  +caption: string
+  +uploaded_by: bigint
+  +created_at: timestamp
+  +updated_at: timestamp
+}
+
+class CashFlow {
+  +id: bigint
+  +type: enum
+  +amount: decimal
+  +transaction_date: date
+  +description: string
+  +receipt_file: string
+  +department_id: bigint
+  +event_id: bigint
+  +status: enum
+  +created_at: timestamp
+  +updated_at: timestamp
+  +approve()
+  +generateReport()
+}
+
+class Notification {
+  +id: bigint
+  +user_id: bigint
+  +title: string
+  +content: text
+  +type: string
+  +url: string
+  +is_read: boolean
+  +read_at: timestamp
+  +created_at: timestamp
+  +updated_at: timestamp
+  +markAsRead()
+}
+
+' Relationships
+User "1" -- "1" Profile : has
+User "1" -- "1" AlumniStatus : has
+User "1" -- "*" UserGroup : belongs to
+User "1" -- "*" UserDepartment : belongs to
+User "1" -- "*" EventRegistration : registers for
+User "1" -- "*" Payment : makes
+Department "1" -- "*" ProgramKerja : manages
+Department "1" -- "*" UserDepartment : has members
+Group "1" -- "*" UserGroup : has members
+Event "1" -- "*" EventRegistration : has
+Gallery "1" -- "*" Photo : contains
+User "1" -- "*" Document : uploads
+User "1" -- "*" Notification : receives
+Department "1" -- "*" CashFlow : manages budget
+
+@enduml
+```

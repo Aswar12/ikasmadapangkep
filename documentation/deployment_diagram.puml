@@ -1,0 +1,61 @@
+```plantuml
+@startuml IKA_SMADA_Pangkep_Deployment_Diagram
+
+node "Client Devices" {
+  [Web Browser] as browser
+  [Mobile App] as mobile
+}
+
+cloud "Internet" as internet
+
+node "Web Server" {
+  [Nginx/Apache] as webserver
+  [PHP-FPM] as phpfpm
+  [Laravel Application] as laravel
+  [Redis Cache] as redis
+}
+
+node "Database Server" {
+  [MySQL Server] as mysql
+  database "IKA SMADA Database" as db
+}
+
+node "File Storage" {
+  [Minio/S3] as storage
+  folder "Documents" as docs
+  folder "Photos" as photos
+  folder "Payment Proofs" as proofs
+}
+
+node "Mail Server" {
+  [SMTP Service] as smtp
+}
+
+node "Backup System" {
+  [Backup Service] as backup
+  database "Backup Storage" as backupdb
+}
+
+browser --> internet
+mobile --> internet
+internet --> webserver
+
+webserver --> phpfpm
+phpfpm --> laravel
+laravel --> redis
+laravel --> mysql
+mysql --> db
+
+laravel --> storage
+storage --> docs
+storage --> photos
+storage --> proofs
+
+laravel --> smtp
+
+backup --> db
+backup --> storage
+backup --> backupdb
+
+@enduml
+```

@@ -1,0 +1,86 @@
+```plantuml
+@startuml IKA_SMADA_Pangkep_Sequence_Diagram_Registration
+
+title Sequence Diagram: Alumni Registration Process
+
+actor "Alumni" as alumni
+participant "Registration Form" as form
+participant "Auth Controller" as authCtrl
+participant "Mail Service" as mail
+participant "User Model" as userModel
+participant "Profile Model" as profileModel
+participant "Admin" as admin
+
+alumni -> form: Fill registration form
+activate form
+
+form -> form: Validate form data
+form -> authCtrl: Submit registration data
+activate authCtrl
+
+authCtrl -> userModel: Create user account
+activate userModel
+userModel --> authCtrl: Return user record
+deactivate userModel
+
+authCtrl -> profileModel: Create profile data
+activate profileModel
+profileModel --> authCtrl: Return profile record
+deactivate profileModel
+
+authCtrl -> mail: Send verification email
+activate mail
+mail --> alumni: Deliver email
+deactivate mail
+
+authCtrl --> form: Account created status
+deactivate authCtrl
+
+form --> alumni: Registration success message
+deactivate form
+
+alumni -> mail: Click verification link
+activate mail
+
+mail -> authCtrl: Verify email
+activate authCtrl
+authCtrl -> userModel: Update email_verified status
+activate userModel
+userModel --> authCtrl: Status updated
+deactivate userModel
+
+authCtrl -> userModel: Set pending approval status
+activate userModel
+userModel --> authCtrl: Status updated
+deactivate userModel
+
+authCtrl -> mail: Notify admin
+activate mail
+mail --> admin: Approval request notification
+deactivate mail
+
+authCtrl --> alumni: Email verified confirmation
+deactivate authCtrl
+
+admin -> authCtrl: Review and approve registration
+activate authCtrl
+authCtrl -> userModel: Update approval status
+activate userModel
+userModel --> authCtrl: Status updated
+deactivate userModel
+
+authCtrl -> mail: Send approval notification
+activate mail
+mail --> alumni: Account approval notification
+deactivate mail
+
+authCtrl --> admin: Approval confirmed
+deactivate authCtrl
+
+alumni -> form: Login to account
+activate form
+form --> alumni: Access to system granted
+deactivate form
+
+@enduml
+```

@@ -1,0 +1,70 @@
+# Contoh Struktur Dasar Untuk Diagram Sequence di Excalidraw
+
+```
+Sequence: Alumni Registration Process
+------------------
+Actors/Objects:
+- Alumni
+- Registration Form
+- Auth Controller
+- Mail Service
+- User Model
+- Profile Model
+- Admin
+------------------
+Sequence:
+Alumni → Registration Form: Fill form
+Registration Form → Registration Form: Validate data
+Registration Form → Auth Controller: Submit data
+Auth Controller → User Model: Create user
+User Model → Auth Controller: Return user record
+Auth Controller → Profile Model: Create profile
+Profile Model → Auth Controller: Return profile
+Auth Controller → Mail Service: Send verification email
+Mail Service → Alumni: Deliver email
+Auth Controller → Registration Form: Account created
+Registration Form → Alumni: Success message
+```
+
+# Representasi Lifeline
+
+```
++----------------+
+|     Object     |
++----------------+
+       |
+       |
+       |
+       |
+       ↓
+```
+
+# Representasi Activation
+
+```
++----------------+
+|     Object     |
++----------------+
+       |
+       +-------+
+       |       |
+       |       |
+       +-------+
+       |
+```
+
+# Langkah-Langkah Pembuatan Diagram Sequence
+
+1. Arrange objects/actors horizontally di bagian atas
+2. Draw dashed vertical lines (lifelines) di bawah setiap object
+3. Draw horizontal arrows untuk pesan antar object
+4. Draw rectangles pada lifeline untuk menunjukkan activation
+5. Maintain chronological order dari atas ke bawah
+
+# Tips Untuk Excalidraw:
+- Gunakan rectangle untuk box object/actor
+- Gunakan dashed line untuk lifeline
+- Gunakan solid arrow untuk synchronous message
+- Gunakan dashed arrow untuk return/reply
+- Gunakan thin rectangles pada lifeline untuk activation
+- Urutan waktu berjalan dari atas ke bawah

@@ -1,0 +1,76 @@
+```plantuml
+@startuml IKA_SMADA_Pangkep_Activity_Diagram_Program_Kerja
+
+title Activity Diagram: Program Kerja Management
+
+|Ketua Departemen|
+start
+:Draft Program Kerja;
+:Input program details (name, timeline, budget);
+:Set PIC and expected outcome;
+:Submit proposal;
+
+|Sistem|
+:Validate input;
+:Create program record with status "Proposed";
+:Notify Ketua Umum;
+
+|Ketua Umum|
+:Review program proposal;
+if (Approved?) then (yes)
+  :Approve program;
+else (no)
+  :Request revision;
+  |Ketua Departemen|
+  :Revise program proposal;
+  |Sistem|
+  :Update program details;
+  :Notify Ketua Umum;
+  |Ketua Umum|
+  :Review revised proposal;
+endif
+
+|Sistem|
+:Update program status to "Approved";
+:Notify all stakeholders;
+:Add to organization calendar;
+
+|Ketua Departemen|
+:Implement program;
+:Update progress regularly;
+
+|Sistem|
+:Calculate progress percentage;
+:Send reminders for updates;
+:Generate progress reports;
+
+|Ketua Departemen|
+if (Program completed?) then (yes)
+  :Submit final report;
+  :Upload supporting documents;
+else (no)
+  :Continue implementation;
+  note right
+    Loop until 
+    completed
+  end note
+endif
+
+|Sistem|
+:Update program status to "Completed";
+:Archive program documents;
+:Generate completion certificate;
+:Update department KPI;
+
+|Bendahara|
+:Review financial report;
+:Close program budget;
+
+|Sistem|
+:Send program completion notification;
+:Add to annual report;
+
+stop
+
+@enduml
+```

@@ -1,0 +1,67 @@
+# Contoh Struktur Dasar Untuk Component Diagram di Excalidraw
+
+```
+Components:
+------------------
+┌─────────────────────┐      ┌─────────────────────┐
+│   Frontend Layer    │      │     API Layer       │
+│ ┌───────────────┐   │      │ ┌───────────────┐   │
+│ │ Web Interface │   │      │ │   REST API    │   │
+│ └───────────────┘   │      │ └───────────────┘   │
+│ ┌───────────────┐   │      │ ┌───────────────┐   │
+│ │  Mobile View  │   │      │ │   Auth Svc    │   │
+│ └───────────────┘   │      │ └───────────────┘   │
+└─────────────────────┘      └─────────────────────┘
+          │                            │
+          │                            │
+          ▼                            ▼
+┌─────────────────────┐      ┌─────────────────────┐
+│  Business Logic     │      │   Data Access       │
+│ ┌───────────────┐   │      │ ┌───────────────┐   │
+│ │ User Mgmt     │   │      │ │ Query Builder │   │
+│ └───────────────┘   │      │ └───────────────┘   │
+│ ┌───────────────┐   │      │ ┌───────────────┐   │
+│ │ Dept Mgmt     │   │      │ │ Repositories  │   │
+│ └───────────────┘   │      │ └───────────────┘   │
+└─────────────────────┘      └─────────────────────┘
+```
+
+# Notasi Component
+
+```
+Component Standard
+┌───────────────┐
+│ Component Name│
+└───────────────┘
+
+Component with Ports
+┌───────────────┐
+│     Name      │◯─── Provided Interface
+└───┯───────────┘
+    │
+    ◯─── Required Interface
+
+Package
+┌───────────────────┐
+│    Package Name   │
+│ ┌───────────────┐ │
+│ │  Component    │ │
+│ └───────────────┘ │
+└───────────────────┘
+```
+
+# Langkah-Langkah Pembuatan Component Diagram
+
+1. Identifikasi major components dalam sistem
+2. Group components ke dalam logical packages atau layers
+3. Draw components menggunakan notasi yang benar (bentuk component)
+4. Tunjukkan interfaces antar components
+5. Connect components dengan dependencies (arrow)
+6. Label interfaces dan components dengan jelas
+
+# Tips Untuk Component Diagram di Excalidraw:
+- Gunakan warna berbeda untuk layer atau package yang berbeda
+- Tunjukkan arah dependencies dengan arrow
+- Gunakan grouping untuk menunjukkan logical units
+- Fokus pada high-level architecture, bukan implementation details
+- Pastikan semua components terkoneksi dengan benar melalui interface

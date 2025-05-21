@@ -12,42 +12,23 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            if (!Schema::hasColumn('users', 'ip_address')) {
-                $table->string('ip_address')->nullable()->after('id');
-            }
-            if (!Schema::hasColumn('users', 'username')) {
-                $table->string('username')->unique()->after('ip_address');
-            }
-            if (!Schema::hasColumn('users', 'salt')) {
-                $table->string('salt')->nullable()->after('password');
-            }
-            if (!Schema::hasColumn('users', 'activation_code')) {
-                $table->string('activation_code')->nullable()->after('email');
-            }
-            if (!Schema::hasColumn('users', 'forgotten_password_code')) {
-                $table->string('forgotten_password_code')->nullable()->after('activation_code');
-            }
-            if (!Schema::hasColumn('users', 'forgotten_password_time')) {
-                $table->timestamp('forgotten_password_time')->nullable()->after('forgotten_password_code');
-            }
-            if (!Schema::hasColumn('users', 'remember_code')) {
-                $table->string('remember_code')->nullable()->after('forgotten_password_time');
-            }
-            if (!Schema::hasColumn('users', 'created_on')) {
-                $table->timestamp('created_on')->nullable()->after('remember_code');
-            }
-            if (!Schema::hasColumn('users', 'last_login')) {
-                $table->timestamp('last_login')->nullable()->after('created_on');
-            }
-            if (!Schema::hasColumn('users', 'active')) {
-                $table->boolean('active')->default(false)->after('last_login');
-            }
-            if (!Schema::hasColumn('users', 'first_name')) {
-                $table->string('first_name')->nullable()->after('active');
-            }
-            if (!Schema::hasColumn('users', 'last_name')) {
-                $table->string('last_name')->nullable()->after('first_name');
-            }
+            // Additional fields for user profile
+            $table->string('bio')->nullable();
+            $table->string('profile_picture')->nullable();
+            $table->string('social_media_links')->nullable();
+            $table->date('birth_date')->nullable();
+            $table->string('address')->nullable();
+            $table->string('city')->nullable();
+            $table->string('province')->nullable();
+            $table->string('postal_code')->nullable();
+            $table->string('current_position')->nullable();
+            $table->string('current_company')->nullable();
+            $table->string('education_history')->nullable();
+            $table->string('work_history')->nullable();
+            // Additional security fields
+            $table->boolean('two_factor_enabled')->default(false);
+            $table->string('two_factor_secret')->nullable();
+            $table->timestamp('last_password_change')->nullable();
         });
     }
 
@@ -57,25 +38,23 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $columns = [
-                'ip_address',
-                'username',
-                'salt',
-                'activation_code',
-                'forgotten_password_code',
-                'forgotten_password_time',
-                'remember_code',
-                'created_on',
-                'last_login',
-                'active',
-                'first_name',
-                'last_name',
-            ];
-            foreach ($columns as $column) {
-                if (Schema::hasColumn('users', $column)) {
-                    $table->dropColumn($column);
-                }
-            }
+            $table->dropColumn([
+                'bio',
+                'profile_picture',
+                'social_media_links',
+                'birth_date',
+                'address',
+                'city',
+                'province',
+                'postal_code',
+                'current_position',
+                'current_company',
+                'education_history',
+                'work_history',
+                'two_factor_enabled',
+                'two_factor_secret',
+                'last_password_change'
+            ]);
         });
     }
 };

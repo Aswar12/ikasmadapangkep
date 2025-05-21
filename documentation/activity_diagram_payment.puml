@@ -1,0 +1,62 @@
+```plantuml
+@startuml IKA_SMADA_Pangkep_Activity_Diagram_Payment
+
+title Activity Diagram: Payment Processing
+
+|Alumni|
+start
+:Login to system;
+:Navigate to Payment page;
+:Select payment year;
+:Choose payment method;
+:Upload payment proof;
+:Submit payment;
+
+|Sistem|
+:Validate payment details;
+:Create payment record;
+:Set status as "Pending";
+:Send confirmation to Alumni;
+:Notify Bendahara;
+
+|Bendahara|
+:Login to system;
+:View pending payments;
+:Review payment proof;
+
+if (Valid payment?) then (yes)
+  :Approve payment;
+else (no)
+  :Reject payment;
+  :Add rejection reason;
+  
+  |Sistem|
+  :Update payment status to "Rejected";
+  :Notify Alumni;
+  
+  |Alumni|
+  :View rejection reason;
+  :Submit new payment proof;
+  
+  |Sistem|
+  :Update payment record;
+  :Notify Bendahara;
+  
+  |Bendahara|
+  :Review updated payment;
+endif
+
+|Sistem|
+:Update payment status to "Verified";
+:Generate payment receipt;
+:Update membership status;
+:Send verification notification;
+
+|Alumni|
+:Receive payment confirmation;
+:Download receipt (optional);
+
+stop
+
+@enduml
+```

@@ -1,0 +1,95 @@
+```plantuml
+@startuml IKA_SMADA_Pangkep_Sequence_Diagram_MUBES
+
+title Sequence Diagram: MUBES (Musyawarah Besar) Process
+
+actor "Ketua Umum" as ketuaUmum
+participant "MUBES Controller" as mubesCtrl
+participant "Notification Service" as notifSvc
+participant "User Model" as userModel
+participant "MUBES Model" as mubesModel
+participant "Document Model" as docModel
+actor "Alumni" as alumni
+actor "Presidium" as presidium
+
+ketuaUmum -> mubesCtrl: Schedule MUBES
+activate mubesCtrl
+
+mubesCtrl -> mubesModel: Create MUBES record
+activate mubesModel
+mubesModel --> mubesCtrl: MUBES created
+deactivate mubesModel
+
+mubesCtrl -> notifSvc: Send MUBES announcement
+activate notifSvc
+notifSvc -> userModel: Get all active alumni
+activate userModel
+userModel --> notifSvc: Alumni list
+deactivate userModel
+
+notifSvc --> alumni: MUBES invitation notification
+deactivate notifSvc
+
+mubesCtrl --> ketuaUmum: MUBES scheduled confirmation
+deactivate mubesCtrl
+
+ketuaUmum -> mubesCtrl: Upload MUBES materials
+activate mubesCtrl
+mubesCtrl -> docModel: Store documents
+activate docModel
+docModel --> mubesCtrl: Documents stored
+deactivate docModel
+
+mubesCtrl -> notifSvc: Notify about materials
+activate notifSvc
+notifSvc --> alumni: Materials available notification
+deactivate notifSvc
+mubesCtrl --> ketuaUmum: Materials uploaded confirmation
+deactivate mubesCtrl
+
+alumni -> mubesCtrl: Register for attendance
+activate mubesCtrl
+mubesCtrl -> mubesModel: Record attendance
+activate mubesModel
+mubesModel --> mubesCtrl: Attendance recorded
+deactivate mubesModel
+mubesCtrl --> alumni: Registration confirmed
+deactivate mubesCtrl
+
+note over alumni, presidium: On MUBES day
+
+alumni -> presidium: Elect presidium members
+activate presidium
+
+presidium -> mubesCtrl: Record discussions and decisions
+activate mubesCtrl
+mubesCtrl -> mubesModel: Store proceedings
+activate mubesModel
+mubesModel --> mubesCtrl: Proceedings saved
+deactivate mubesModel
+mubesCtrl --> presidium: Confirmed
+deactivate mubesCtrl
+
+presidium -> mubesCtrl: Submit final decisions
+activate mubesCtrl
+mubesCtrl -> mubesModel: Store decisions
+activate mubesModel
+mubesModel --> mubesCtrl: Decisions saved
+deactivate mubesModel
+
+mubesCtrl -> docModel: Generate AD/ART documents
+activate docModel
+docModel --> mubesCtrl: Documents generated
+deactivate docModel
+
+mubesCtrl -> notifSvc: Notify about decisions
+activate notifSvc
+notifSvc --> alumni: MUBES results notification
+deactivate notifSvc
+
+mubesCtrl --> presidium: MUBES concluded
+deactivate mubesCtrl
+deactivate presidium
+
+@enduml
+```

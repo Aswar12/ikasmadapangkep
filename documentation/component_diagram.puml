@@ -1,0 +1,70 @@
+```plantuml
+@startuml IKA_SMADA_Pangkep_Component_Diagram
+
+package "Frontend Layer" {
+  [Web Interface] as web
+  [Mobile View] as mobile
+  [Admin Dashboard] as admin
+}
+
+package "API Layer" {
+  [REST API Gateway] as api
+  [Authentication Service] as auth
+  [File Upload Service] as upload
+}
+
+package "Business Logic Layer" {
+  [User Management] as userMgmt
+  [Department Management] as deptMgmt
+  [Event Management] as eventMgmt
+  [Gallery Management] as galleryMgmt
+  [Document Management] as docMgmt
+  [Financial Management] as financeMgmt
+  [MUBES Management] as mubesMgmt
+  [Notification Service] as notifSvc
+}
+
+package "Data Access Layer" {
+  [Query Builder] as query
+  [Model Repositories] as repo
+  [Cache Service] as cache
+}
+
+database "MySQL Database" as db
+
+web --> api
+mobile --> api
+admin --> api
+
+api --> auth
+api --> upload
+api --> userMgmt
+api --> deptMgmt
+api --> eventMgmt
+api --> galleryMgmt
+api --> docMgmt
+api --> financeMgmt
+api --> mubesMgmt
+
+userMgmt --> notifSvc
+deptMgmt --> notifSvc
+eventMgmt --> notifSvc
+financeMgmt --> notifSvc
+mubesMgmt --> notifSvc
+
+userMgmt --> repo
+deptMgmt --> repo
+eventMgmt --> repo
+galleryMgmt --> repo
+docMgmt --> repo
+financeMgmt --> repo
+mubesMgmt --> repo
+
+repo --> query
+query --> cache
+query --> db
+
+upload --> [File Storage System]
+
+@enduml
+```

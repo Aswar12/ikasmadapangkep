@@ -1,0 +1,366 @@
+```plantuml
+@startuml IKA_SMADA_Pangkep_ERD
+
+' Entities
+
+entity "users" as users {
+  * id : bigint <<PK>>
+  --
+  * name : string
+  * email : string <<unique>>
+  * password : string
+  * role : enum
+  graduation_year : string
+  phone : string
+  * active : boolean
+  * created_at : timestamp
+  * updated_at : timestamp
+}
+
+entity "profiles" as profiles {
+  * id : bigint <<PK>>
+  --
+  * user_id : bigint <<FK>>
+  gender : string
+  birth_place : string
+  birth_date : date
+  address : text
+  national_student_number : string
+  father_name : string
+  mother_name : string
+  entry_year : string
+  graduation_year : string
+  diploma_number : string
+  profile_photo : string
+  * created_at : timestamp
+  * updated_at : timestamp
+}
+
+entity "alumni_statuses" as alumniStatuses {
+  * id : bigint <<PK>>
+  --
+  * user_id : bigint <<FK>>
+  * status : enum
+  company_name : string
+  position : string
+  institution_name : string
+  education_level : string
+  business_name : string
+  note : text
+  * created_at : timestamp
+  * updated_at : timestamp
+}
+
+entity "departments" as departments {
+  * id : bigint <<PK>>
+  --
+  * name : string
+  description : text
+  coordinator_id : bigint <<FK>>
+  * created_at : timestamp
+  * updated_at : timestamp
+}
+
+entity "user_departments" as userDepartments {
+  * id : bigint <<PK>>
+  --
+  * user_id : bigint <<FK>>
+  * department_id : bigint <<FK>>
+  * role : enum
+  * created_at : timestamp
+  * updated_at : timestamp
+}
+
+entity "program_kerja" as programKerja {
+  * id : bigint <<PK>>
+  --
+  * department_id : bigint <<FK>>
+  * name : string
+  description : text
+  start_date : date
+  end_date : date
+  location : string
+  budget : decimal
+  person_in_charge : bigint <<FK>>
+  * status : enum
+  * progress_percentage : integer
+  current_progress : text
+  * created_at : timestamp
+  * updated_at : timestamp
+}
+
+entity "program_kerja_updates" as programUpdates {
+  * id : bigint <<PK>>
+  --
+  * program_kerja_id : bigint <<FK>>
+  * user_id : bigint <<FK>>
+  * update_notes : text
+  * progress_percentage : integer
+  status : enum
+  * created_at : timestamp
+  * updated_at : timestamp
+}
+
+entity "groups" as groups {
+  * id : bigint <<PK>>
+  --
+  * name : string
+  description : text
+  graduation_year : string
+  coordinator_id : bigint <<FK>>
+  * created_at : timestamp
+  * updated_at : timestamp
+}
+
+entity "user_groups" as userGroups {
+  * id : bigint <<PK>>
+  --
+  * user_id : bigint <<FK>>
+  * group_id : bigint <<FK>>
+  * role : enum
+  * created_at : timestamp
+  * updated_at : timestamp
+}
+
+entity "events" as events {
+  * id : bigint <<PK>>
+  --
+  department_id : bigint <<FK>>
+  program_kerja_id : bigint <<FK>>
+  * title : string
+  description : text
+  * start_date : datetime
+  end_date : datetime
+  location : string
+  cover_image : string
+  max_participants : integer
+  registration_fee : decimal
+  * is_published : boolean
+  * created_at : timestamp
+  * updated_at : timestamp
+}
+
+entity "event_registrations" as eventRegistrations {
+  * id : bigint <<PK>>
+  --
+  * event_id : bigint <<FK>>
+  * user_id : bigint <<FK>>
+  * status : enum
+  payment_proof : string
+  * is_paid : boolean
+  * created_at : timestamp
+  * updated_at : timestamp
+}
+
+entity "job_vacancies" as jobVacancies {
+  * id : bigint <<PK>>
+  --
+  * user_id : bigint <<FK>>
+  * title : string
+  * company_name : string
+  description : text
+  requirements : text
+  location : string
+  salary_min : decimal
+  salary_max : decimal
+  application_deadline : date
+  * is_published : boolean
+  * created_at : timestamp
+  * updated_at : timestamp
+}
+
+entity "payments" as payments {
+  * id : bigint <<PK>>
+  --
+  * user_id : bigint <<FK>>
+  * payment_year : string
+  * amount : decimal
+  payment_method : string
+  proof_file : string
+  * status : enum
+  notes : text
+  verified_by : bigint <<FK>>
+  verified_at : timestamp
+  * created_at : timestamp
+  * updated_at : timestamp
+}
+
+entity "cash_flows" as cashFlows {
+  * id : bigint <<PK>>
+  --
+  category_id : bigint <<FK>>
+  * type : enum
+  * amount : decimal
+  * transaction_date : date
+  * description : string
+  receipt_file : string
+  * created_by : bigint <<FK>>
+  department_id : bigint <<FK>>
+  program_kerja_id : bigint <<FK>>
+  event_id : bigint <<FK>>
+  * status : enum
+  approved_by : bigint <<FK>>
+  approved_at : timestamp
+  * created_at : timestamp
+  * updated_at : timestamp
+}
+
+entity "albums" as albums {
+  * id : bigint <<PK>>
+  --
+  * title : string
+  description : text
+  * created_by : bigint <<FK>>
+  cover_image : string
+  event_name : string
+  event_date : date
+  graduation_year : string
+  * is_public : boolean
+  * created_at : timestamp
+  * updated_at : timestamp
+}
+
+entity "photos" as photos {
+  * id : bigint <<PK>>
+  --
+  * album_id : bigint <<FK>>
+  * file_path : string
+  caption : string
+  * uploaded_by : bigint <<FK>>
+  view_count : integer
+  * created_at : timestamp
+  * updated_at : timestamp
+}
+
+entity "photo_tags" as photoTags {
+  * id : bigint <<PK>>
+  --
+  * photo_id : bigint <<FK>>
+  * user_id : bigint <<FK>>
+  position_x : integer
+  position_y : integer
+  * tagged_by : bigint <<FK>>
+  * created_at : timestamp
+  * updated_at : timestamp
+}
+
+entity "documents" as documents {
+  * id : bigint <<PK>>
+  --
+  * title : string
+  description : text
+  department_id : bigint <<FK>>
+  program_kerja_id : bigint <<FK>>
+  * file_path : string
+  * file_type : string
+  * uploaded_by : bigint <<FK>>
+  * is_public : boolean
+  * is_versioned : boolean
+  * current_version : integer
+  * created_at : timestamp
+  * updated_at : timestamp
+}
+
+entity "document_versions" as documentVersions {
+  * id : bigint <<PK>>
+  --
+  * document_id : bigint <<FK>>
+  * version_number : integer
+  * file_path : string
+  change_notes : text
+  * uploaded_by : bigint <<FK>>
+  * created_at : timestamp
+  * updated_at : timestamp
+}
+
+entity "notifications" as notifications {
+  * id : bigint <<PK>>
+  --
+  * user_id : bigint <<FK>>
+  * title : string
+  * content : text
+  type : string
+  url : string
+  related_type : string
+  related_id : bigint
+  * is_read : boolean
+  read_at : timestamp
+  * created_at : timestamp
+  * updated_at : timestamp
+}
+
+entity "mubes" as mubes {
+  * id : bigint <<PK>>
+  --
+  * title : string
+  * date : date
+  * location : string
+  description : text
+  status : enum
+  agenda : text
+  minutes : text
+  created_by : bigint <<FK>>
+  * created_at : timestamp
+  * updated_at : timestamp
+}
+
+entity "mubes_participants" as mubesParticipants {
+  * id : bigint <<PK>>
+  --
+  * mubes_id : bigint <<FK>>
+  * user_id : bigint <<FK>>
+  * attendance_status : enum
+  attendance_time : timestamp
+  * created_at : timestamp
+  * updated_at : timestamp
+}
+
+entity "mubes_decisions" as mubesDecisions {
+  * id : bigint <<PK>>
+  --
+  * mubes_id : bigint <<FK>>
+  * title : string
+  * content : text
+  * decision_type : enum
+  * created_at : timestamp
+  * updated_at : timestamp
+}
+
+' Relationships
+
+users ||--o| profiles
+users ||--o| alumniStatuses
+users }|--|| userGroups
+users }|--|| userDepartments
+users }|--|| eventRegistrations
+users }|--|| payments
+users }|--|| notifications
+users }|--|| photoTags
+
+departments ||--|{ userDepartments
+departments ||--|{ programKerja
+departments }o--|| events
+departments }o--|| documents
+departments }o--|| cashFlows
+
+groups ||--|{ userGroups
+
+events ||--|{ eventRegistrations
+events }o--|| cashFlows
+
+programKerja ||--|{ programUpdates
+programKerja }o--|| events
+programKerja }o--|| documents
+programKerja }o--|| cashFlows
+
+albums ||--|{ photos
+
+photos ||--|{ photoTags
+
+documents ||--|{ documentVersions
+
+mubes ||--|{ mubesParticipants
+mubes ||--|{ mubesDecisions
+
+@enduml
+```

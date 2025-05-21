@@ -1,0 +1,46 @@
+# Contoh Struktur Dasar Untuk Diagram Class di Excalidraw
+
+```
+Nama Class: User
+------------------
+Attributes:
+- id: bigint
+- name: string
+- email: string
+- password: string
+- role: enum
+------------------
+Methods:
++ authenticate()
++ updateProfile()
++ resetPassword()
+```
+
+# Relasi Antar Class
+
+User ─────────────► Profile (1:1)
+
+User ─────────────► AlumniStatus (1:1)
+
+User ◇─────────────► Group (M:N)
+
+Department ◆─────────────► ProgramKerja (1:N)
+
+# Contoh Entity
+
+users (id, name, email, password, role)
+  ↓
+profiles (id, user_id, gender, birth_date, address)
+
+# Langkah-Langkah Pembuatan Diagram Class
+
+1. Buat rectangle untuk setiap class
+2. Bagi menjadi 3 bagian: nama class, attributes, methods
+3. Connect class dengan arrow & symbols untuk relasi
+4. Gunakan simbol * untuk atribut required
+5. Gunakan + untuk public method, - untuk private
+
+# Catatan:
+- Diagram yang dibuat di Excalidraw bersifat visual, tidak memiliki constraint seperti di PlantUML
+- Keuntungan Excalidraw: lebih mudah dimodifikasi untuk presentasi
+- Kerugian Excalidraw: tidak memiliki validasi syntax seperti PlantUML

@@ -1,0 +1,57 @@
+# Contoh Struktur Dasar Untuk ERD di Excalidraw
+
+```
+Entities:
+------------------
+┌───────────────┐      ┌───────────────┐
+│     users     │      │    profiles   │
+├───────────────┤      ├───────────────┤
+│ id (PK)       │      │ id (PK)       │
+│ name          │      │ user_id (FK)  │
+│ email         │      │ gender        │
+│ password      │      │ birth_date    │
+│ role          │      │ address       │
+└───────────────┘      └───────────────┘
+        │ 1                    │ 1
+        │                      │
+        │ 1:1                  │
+        ▼                      │
+┌───────────────┐              │
+│ alumni_status │◄─────────────┘
+├───────────────┤
+│ id (PK)       │
+│ user_id (FK)  │
+│ status        │
+│ company_name  │
+│ position      │
+└───────────────┘
+```
+
+# Notasi Kardinalitas
+
+```
+One-to-One (1:1)
+A ─────1───── B
+
+One-to-Many (1:N)
+A ─────1─┤├──N─ B
+
+Many-to-Many (M:N)
+A ──────M─┤├─N── B
+```
+
+# Langkah-Langkah Pembuatan ERD
+
+1. Identifikasi semua entities (tables)
+2. Buat rectangle untuk setiap entity
+3. List attributes dalam setiap entity (terutama primary dan foreign keys)
+4. Connect entities dengan garis untuk menunjukkan relationships
+5. Label relationships dengan kardinalitas (1:1, 1:N, M:N)
+6. Highlight primary keys dan foreign keys
+
+# Tips Untuk ERD di Excalidraw:
+- Gunakan warna berbeda untuk primary keys dan foreign keys
+- Gunakan simbol crow's foot untuk menunjukkan kardinalitas (atau gunakan notasi 1, N, M)
+- Pastikan semua entities terkoneksi dengan benar
+- Gunakan grid untuk alignment yang baik
+- Tunjukkan hanya attribute penting untuk readability

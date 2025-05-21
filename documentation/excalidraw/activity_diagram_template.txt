@@ -1,0 +1,51 @@
+# Contoh Struktur Dasar Untuk Diagram Activity di Excalidraw
+
+```
+Activity: Program Kerja Management
+------------------
+Lanes:
+- Ketua Departemen
+- Sistem
+- Ketua Umum
+------------------
+Start → Draft Program Kerja → Input Details → Submit Proposal
+                                                    ↓
+                                             Validate Input
+                                                    ↓
+                                           Create Program Record
+                                                    ↓
+                                            Notify Ketua Umum
+                                                    ↓
+                                           Review Program Proposal
+                                                    ↓
+                              [Decision: Approved?] → No → Request Revision
+                                       Yes |                    ↓
+                                           ↓              Revise Proposal
+                                 Update Program Status          ↓
+                                           ↓               (Back to Review)
+                                  Notify Stakeholders
+                                           ↓
+                                   Implement Program
+                                           ↓
+                                 Update Progress Regularly
+                                           ↓
+                              [Decision: Completed?] → No → Continue Implementation
+                                       Yes |
+                                           ↓
+                                  Submit Final Report → End
+```
+
+# Langkah-Langkah Pembuatan Diagram Activity
+
+1. Buat swimlanes (kolom vertikal) untuk setiap aktor/sistem
+2. Buat circle untuk Start dan End
+3. Buat rounded rectangles untuk aktivitas
+4. Buat diamond untuk decision points
+5. Connect activities dengan arrow
+6. Label decision paths dengan Yes/No atau kondisi lainnya
+
+# Tips Untuk Excalidraw:
+- Gunakan warna berbeda untuk setiap swimlane
+- Pastikan arrow dan flow mudah diikuti
+- Gunakan dashed vertical lines untuk memisahkan swimlanes
+- Diagram activity harus memiliki satu start point dan minimal satu end point
