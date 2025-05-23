@@ -3,6 +3,7 @@
 @push('styles')
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="{{ asset('css/landing-page.css') }}">
+<link rel="stylesheet" href="{{ asset('css/organization.css') }}">
 @endpush
 
 @section('content')
@@ -10,6 +11,7 @@
     @include('components.landing.hero')
     @include('components.landing.features')
     @include('components.landing.about')
+    @include('components.landing.organization')
     @include('components.landing.events')
     @include('components.landing.alumni-search')
     @include('components.landing.contact')

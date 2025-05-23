@@ -40,13 +40,13 @@ class EmailVerificationController extends Controller
     public function verify(Request $request): RedirectResponse
     {
         if ($request->user()->hasVerifiedEmail()) {
-            return redirect()->intended(RouteServiceProvider::HOME.'?verified=1');
+            return redirect()->route('approval.pending');
         }
 
         if ($request->user()->markEmailAsVerified()) {
             event(new \Illuminate\Auth\Events\Verified($request->user()));
         }
 
-        return redirect()->intended(RouteServiceProvider::HOME.'?verified=1');
+        return redirect()->route('approval.pending');
     }
 }

@@ -29,7 +29,13 @@
                 </li>
                 @auth
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('dashboard') }}">Dashboard</a>
+                        @if(auth()->user()->role === 'admin')
+                            <a class="nav-link" href="{{ route('admin.dashboard') }}">Dashboard</a>
+                        @elseif(auth()->user()->role === 'department_coordinator')
+                            <a class="nav-link" href="{{ route('department.dashboard') }}">Dashboard</a>
+                        @else
+                            <a class="nav-link" href="{{ route('alumni.dashboard') }}">Dashboard</a>
+                        @endif
                     </li>
                 @else
                     <li class="nav-item">

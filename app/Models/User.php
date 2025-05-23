@@ -2,15 +2,23 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
+// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Fortify\TwoFactorAuthenticatable;
+use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Sanctum\HasApiTokens;
 
-class User extends Authenticatable implements MustVerifyEmail
+class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
+
+    /** @use HasFactory<\Database\Factories\UserFactory> */
+    use HasFactory;
+    use HasProfilePhoto;
+    use Notifiable;
+    use TwoFactorAuthenticatable;
 
     /**
      * The attributes that are mass assignable.
@@ -19,16 +27,8 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     protected $fillable = [
         'name',
-        'username',
         'email',
         'password',
-        'phone',
-        'graduation_year',
-        'role',
-        'active',
-        'approved',
-        'approved_at',
-        'approved_by',
     ];
 
     /**
@@ -39,102 +39,135 @@ class User extends Authenticatable implements MustVerifyEmail
     protected $hidden = [
         'password',
         'remember_token',
+        'two_factor_recovery_codes',
+        'two_factor_secret',
     ];
 
     /**
-     * The attributes that should be cast.
+     * The accessors to append to the model's array form.
      *
-     * @var array<string, string>
+     * @var array<int, string>
      */
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-        'password' => 'hashed',
-        'approved_at' => 'datetime',
-        'active' => 'boolean',
-        'approved' => 'boolean',
+    protected $appends = [
+        'profile_photo_url',
     ];
 
     /**
-     * Get the profile associated with the user.
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
      */
-    public function profile()
+    protected function casts(): array
     {
-        return $this->hasOne(Profile::class);
+        return [
+            'email_verified_at' => 'datetime',
+            'password' => 'hashed',
+        ];
     }
 
     /**
-     * Get the alumni status associated with the user.
+     * Check if the user has a specific role.
      */
-    public function alumniStatus()
+    public function hasRole(string $role): bool
     {
-        return $this->hasOne(AlumniStatus::class);
+        return $this->role === $role;
     }
 
     /**
-     * Get the groups that the user belongs to.
+     * Check if the user has any of the given roles.
      */
-    public function groups()
+    public function hasAnyRole(array $roles): bool
     {
-        return $this->belongsToMany(Group::class, 'user_groups')
-            ->withPivot('role')
-            ->withTimestamps();
+        return in_array($this->role, $roles);
     }
 
     /**
-     * Get the departments that the user belongs to.
+     * Check if the user is an admin (including sub-admin).
      */
-    public function departments()
+    public function isAdmin(): bool
     {
-        return $this->belongsToMany(Department::class, 'user_departments')
-            ->withPivot('role')
-            ->withTimestamps();
+        return $this->hasAnyRole(['admin', 'sub_admin']);
     }
 
     /**
-     * Check if user is an admin.
+     * Check if the user is a department coordinator.
      */
-    public function isAdmin()
+    public function isDepartmentCoordinator(): bool
     {
-        return $this->role === 'admin';
+        return $this->hasRole('department_coordinator');
     }
 
     /**
-     * Check if user is a sub-admin.
+     * Check if the user is a regular alumni.
      */
-    public function isSubAdmin()
+    public function isAlumni(): bool
     {
-        return $this->role === 'sub_admin';
+        return $this->hasRole('alumni');
     }
 
     /**
-     * Check if user is a department coordinator.
+     * Find user by login identifier (email, username, or phone)
      */
-    public function isDepartmentCoordinator()
+    public static function findForLogin($login)
     {
-        return $this->role === 'department_coordinator';
+        return static::where('email', $login)
+            ->orWhere('username', $login)
+            ->orWhere('phone', $login)
+            ->first();
     }
 
     /**
-     * Check if user is an alumni.
+     * Custom login validation rules
      */
-    public function isAlumni()
+    public static function loginValidationRules(): array
     {
-        return $this->role === 'alumni';
+        return [
+            'login' => ['required', 'string'],
+            'password' => ['required', 'string'],
+        ];
     }
 
     /**
-     * Check if user is approved.
+     * Custom registration validation rules
      */
-    public function isApproved()
+    public static function registrationValidationRules(): array
     {
-        return $this->approved;
+        return [
+            'name' => ['required', 'string', 'max:255'],
+            'username' => [
+                'required',
+                'string',
+                'max:255',
+                'unique:users',
+                'regex:/^[a-zA-Z0-9_-]+$/',
+            ],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'phone' => [
+                'required',
+                'string',
+                'max:20',
+                'unique:users',
+                'regex:/^(\+62|62|0)8[1-9][0-9]{6,9}$/'
+            ],
+            'graduation_year' => ['required', 'string', 'max:4'],
+            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'current_job' => ['nullable', 'string', 'max:255'],
+        ];
     }
 
     /**
-     * Check if user is active.
+     * Get the validation error messages.
      */
-    public function isActive()
+    public static function validationMessages(): array
     {
-        return $this->active;
+        return [
+            'username.unique' => 'Username sudah digunakan.',
+            'username.regex' => 'Username hanya boleh berisi huruf, angka, tanda hubung (-), dan garis bawah (_).',
+            'email.unique' => 'Email sudah digunakan.',
+            'phone.unique' => 'Nomor WhatsApp sudah digunakan.',
+            'phone.regex' => 'Format nomor WhatsApp tidak valid. Gunakan format: 08xx atau +62xx.',
+            'password.confirmed' => 'Konfirmasi kata sandi tidak cocok.',
+            'graduation_year.required' => 'Tahun kelulusan wajib diisi.',
+        ];
     }
 }

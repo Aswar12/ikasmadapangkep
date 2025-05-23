@@ -36,12 +36,8 @@ Route::middleware('guest')->group(function () {
     Route::post('reset-password', [PasswordResetController::class, 'storeReset'])->name('password.update');
 });
 
-// Email Verification Routes
+// Protected Routes
 Route::middleware('auth')->group(function () {
-    Route::get('verify-email', [EmailVerificationController::class, 'notice'])->name('verification.notice');
-    Route::get('verify-email/{id}/{hash}', [EmailVerificationController::class, 'verify'])->middleware(['signed', 'throttle:6,1'])->name('verification.verify');
-    Route::post('email/verification-notification', [EmailVerificationController::class, 'send'])->middleware(['throttle:6,1'])->name('verification.send');
-    
     Route::get('approval-pending', function() {
         return view('auth.approval-pending');
     })->name('approval.pending');
@@ -59,9 +55,7 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
 
 // Protected Routes - only for approved and verified users
 Route::middleware(['auth', 'verified', 'approved'])->group(function () {
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    })->name('dashboard');
+    Route::get('/dashboard', \App\Http\Controllers\DashboardController::class)->name('dashboard');
 });
 
 // Coordinator Routes
@@ -72,4 +66,38 @@ Route::middleware(['auth', 'verified', 'approved', 'role:department_coordinator'
 // Sub-admin Routes
 Route::middleware(['auth', 'verified', 'approved', 'role:sub_admin'])->prefix('sub-admin')->name('sub-admin.')->group(function () {
     // Sub-admin specific routes
+});
+
+// Admin Routes
+Route::middleware(['auth', 'verified', 'role:admin,sub_admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
+    
+    // User Management Routes
+    Route::resource('users', \App\Http\Controllers\Admin\UserController::class);
+    
+    // Department Management Routes
+    Route::resource('departments', \App\Http\Controllers\Admin\DepartmentController::class);
+    
+    // Program Kerja Routes
+    Route::resource('programs', \App\Http\Controllers\Admin\ProgramKerjaController::class);
+    
+    // Event Routes
+    Route::resource('events', \App\Http\Controllers\Admin\EventController::class);
+    
+    // Payment Routes
+    Route::resource('payments', \App\Http\Controllers\Admin\PaymentController::class);
+});
+
+// Department Coordinator Routes
+Route::middleware(['auth', 'verified', 'role:department_coordinator'])->prefix('department')->name('department.')->group(function () {
+    Route::get('/dashboard', function () {
+        return view('department.dashboard');
+    })->name('dashboard');
+});
+
+// Alumni Routes
+Route::middleware(['auth', 'verified', 'role:alumni'])->name('alumni.')->group(function () {
+    Route::get('/dashboard', function () {
+        return view('alumni.dashboard');
+    })->name('dashboard');
 });

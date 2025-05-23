@@ -16,8 +16,9 @@ class LoginAttempt extends Model
      */
     protected $fillable = [
         'ip_address',
-        'email',
+        'login',
         'success',
+        'time',
     ];
 
     /**
@@ -28,19 +29,34 @@ class LoginAttempt extends Model
     protected $casts = [
         'success' => 'boolean',
     ];
-    
+
     /**
-     * Get recent failed login attempts for the given email.
+     * Get recent failed login attempts for a specific login (email/username)
      *
-     * @param string $email
-     * @param int $minutes
+     * @param string $login
      * @return int
      */
-    public static function getRecentFailedAttempts($email, $minutes = 30)
+    public static function getRecentFailedAttempts($login): int
     {
-        return static::where('email', $email)
+        // Get failed attempts in the last 30 minutes
+        return self::where('login', $login)
             ->where('success', false)
-            ->where('created_at', '>=', now()->subMinutes($minutes))
+            ->where('created_at', '>=', now()->subMinutes(30))
+            ->count();
+    }
+
+    /**
+     * Get recent failed login attempts from an IP address
+     *
+     * @param string $ip
+     * @return int
+     */
+    public static function getRecentFailedAttemptsFromIP($ip): int
+    {
+        // Get failed attempts in the last 30 minutes
+        return self::where('ip_address', $ip)
+            ->where('success', false)
+            ->where('created_at', '>=', now()->subMinutes(30))
             ->count();
     }
 }
