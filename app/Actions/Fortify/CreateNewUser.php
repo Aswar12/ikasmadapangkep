@@ -38,9 +38,8 @@ class CreateNewUser implements CreatesNewUsers
             'graduation_year' => $input['graduation_year'],
             'password' => Hash::make($input['password']),
             'role' => 'alumni',
-            'active' => false,
-            'approved' => false,
             'registration_date' => now(),
+            'email_verified_at' => now(),
         ]);
 
         // Create empty profile

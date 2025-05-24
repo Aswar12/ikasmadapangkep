@@ -11,6 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Drop and recreate login_attempts table with correct structure
+        Schema::dropIfExists('login_attempts');
+        
         Schema::create('login_attempts', function (Blueprint $table) {
             $table->id();
             $table->string('ip_address', 45);

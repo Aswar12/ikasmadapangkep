@@ -6,6 +6,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Validation\Rules;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Sanctum\HasApiTokens;
@@ -28,7 +29,17 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'username',
+        'phone',
         'password',
+        'graduation_year',
+        'role',
+        'active',
+        'approved',
+        'registration_date',
+        'email_verified_at',
+        'last_login',
+        'current_job',
     ];
 
     /**
@@ -169,5 +180,30 @@ class User extends Authenticatable
             'password.confirmed' => 'Konfirmasi kata sandi tidak cocok.',
             'graduation_year.required' => 'Tahun kelulusan wajib diisi.',
         ];
+    }
+
+    /**
+     * Relationships
+     */
+    public function eventRegistrations()
+    {
+        return $this->hasMany(EventRegistration::class);
+    }
+
+    public function departments()
+    {
+        return $this->belongsToMany(Department::class, 'user_departments')
+                    ->withPivot('is_coordinator')
+                    ->withTimestamps();
+    }
+
+    public function payments()
+    {
+        return $this->hasMany(Payment::class);
+    }
+
+    public function profile()
+    {
+        return $this->hasOne(Profile::class);
     }
 }

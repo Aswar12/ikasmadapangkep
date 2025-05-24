@@ -44,7 +44,13 @@
                         </a>
 
                         <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                            <a class="dropdown-item" href="{{ route('dashboard') }}">
+                            @if(auth()->user()->role === 'admin' || auth()->user()->role === 'sub_admin')
+                                <a class="dropdown-item" href="{{ route('admin.dashboard') }}">
+                            @elseif(auth()->user()->role === 'department_coordinator')
+                                <a class="dropdown-item" href="{{ route('coordinator.dashboard') }}">
+                            @else
+                                <a class="dropdown-item" href="{{ route('alumni.dashboard') }}">
+                            @endif
                                 <i class="fas fa-tachometer-alt me-2"></i> Dashboard
                             </a>
                             <a class="dropdown-item" href="{{ route('profile.show') }}">

@@ -22,8 +22,7 @@
 </head>
 <body class="font-sans antialiased">
     <div class="min-h-screen bg-gray-50">
-        <!-- Sidebar -->
-        <aside class="fixed inset-y-0 left-0 bg-white shadow-lg max-h-screen w-64">
+        <!-- Sidebar -->        <aside class="fixed inset-y-0 left-0 z-50 lg:block bg-white shadow-lg max-h-screen w-64 transform transition-transform duration-200 ease-in-out lg:transform-none">
             <div class="flex flex-col justify-between h-full">
                 <div class="flex-grow">
                     <div class="px-4 py-6 text-center border-b">
@@ -149,16 +148,15 @@
                     </form>
                 </div>
             </div>
-        </aside>
-
-        <!-- Main Content -->
-        <div class="ml-64 p-8">
-            <!-- Top Navigation -->
-            <nav class="bg-white shadow-sm rounded-xl p-4 mb-6">
-                <div class="flex justify-between items-center">
-                    <div>
-                        <h2 class="text-xl font-bold text-gray-800">@yield('page-title', 'Dashboard')</h2>
-                    </div>
+        </aside>        <!-- Main Content -->
+        <div class="lg:pl-64">
+            <div class="p-8">
+                <!-- Top Navigation -->
+                <nav class="bg-white shadow-sm rounded-xl p-4 mb-6">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h2 class="text-xl font-bold text-gray-800">@yield('page-title', 'Dashboard')</h2>
+                        </div>
                     <div class="flex items-center space-x-4">
                         <button class="text-gray-600 hover:text-gray-900">
                             <i class="fas fa-bell"></i>
@@ -182,12 +180,11 @@
                         </div>
                     </div>
                 </div>
-            </nav>
-
-            <!-- Content -->
+            </nav>            <!-- Content -->
             <main class="bg-white shadow-sm rounded-xl p-6">
                 @yield('content')
             </main>
+            </div>
         </div>
     </div>
 

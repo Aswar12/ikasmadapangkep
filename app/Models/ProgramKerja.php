@@ -56,4 +56,12 @@ class ProgramKerja extends Model
     {
         return $this->hasMany(ProgramKerjaUpdate::class);
     }
+
+    /**
+     * Get the PIC user for the program.
+     */
+    public function picUser()
+    {
+        return $this->belongsTo(User::class, 'pic_user_id');
+    }
 }

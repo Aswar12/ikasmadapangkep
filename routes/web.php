@@ -22,6 +22,38 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+// Debug route untuk cek struktur tabel
+Route::get('/check-columns', function () {
+    try {
+        // Cek dan tambahkan kolom yang dibutuhkan
+        if (!Schema::hasColumn('users', 'last_login_ip')) {
+            DB::statement('ALTER TABLE users ADD COLUMN last_login_ip VARCHAR(45) NULL AFTER last_login');
+        }
+        
+        if (!Schema::hasColumn('users', 'registration_date')) {
+            DB::statement('ALTER TABLE users ADD COLUMN registration_date TIMESTAMP NULL AFTER approved');
+        }
+        
+        $user = App\Models\User::first();
+        
+        return [
+            'columns_added' => 'success',
+            'user_columns' => Schema::getColumnListing('users'),
+            'user_data' => $user ? [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'username' => $user->username,
+                'phone' => $user->phone,
+                'active' => $user->active,
+                'approved' => $user->approved,
+            ] : 'No user found'
+        ];
+    } catch (Exception $e) {
+        return ['error' => $e->getMessage()];
+    }
+});
+
 // Authentication Routes
 Route::middleware('guest')->group(function () {
     Route::get('login', [LoginController::class, 'create'])->name('login');
@@ -46,31 +78,27 @@ Route::middleware('auth')->group(function () {
 });
 
 // Admin Routes
-Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('users/approval', [UserApprovalController::class, 'index'])->name('users.approval');
-    Route::post('users/{user}/approve', [UserApprovalController::class, 'approve'])->name('users.approve');
-    Route::post('users/{user}/reject', [UserApprovalController::class, 'reject'])->name('users.reject');
-    Route::post('users/batch-approve', [UserApprovalController::class, 'batchApprove'])->name('users.batch-approve');
-});
-
-// Protected Routes - only for approved and verified users
-Route::middleware(['auth', 'verified', 'approved'])->group(function () {
-    Route::get('/dashboard', \App\Http\Controllers\DashboardController::class)->name('dashboard');
-});
+    });
 
 // Coordinator Routes
-Route::middleware(['auth', 'verified', 'approved', 'role:department_coordinator'])->prefix('coordinator')->name('coordinator.')->group(function () {
+Route::middleware(['auth', 'role:department_coordinator'])->prefix('coordinator')->name('coordinator.')->group(function () {
     // Department coordinator specific routes
 });
 
 // Sub-admin Routes
-Route::middleware(['auth', 'verified', 'approved', 'role:sub_admin'])->prefix('sub-admin')->name('sub-admin.')->group(function () {
+Route::middleware(['auth', 'role:sub_admin'])->prefix('sub-admin')->name('sub-admin.')->group(function () {
     // Sub-admin specific routes
 });
 
 // Admin Routes
-Route::middleware(['auth', 'verified', 'role:admin,sub_admin'])->prefix('admin')->name('admin.')->group(function () {
-    Route::get('/dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
+Route::middleware(['auth', 'role:admin,sub_admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/dashboard', [\App\Http\Controllers\Dashboard\AdminDashboardController::class, 'index'])->name('dashboard');
+    
+    // User Approval Routes
+    Route::post('approve-user/{userId}', [\App\Http\Controllers\Dashboard\AdminDashboardController::class, 'approveUser'])->name('approve-user');
+    Route::post('reject-user/{userId}', [\App\Http\Controllers\Dashboard\AdminDashboardController::class, 'rejectUser'])->name('reject-user');
     
     // User Management Routes
     Route::resource('users', \App\Http\Controllers\Admin\UserController::class);
@@ -89,15 +117,22 @@ Route::middleware(['auth', 'verified', 'role:admin,sub_admin'])->prefix('admin')
 });
 
 // Department Coordinator Routes
-Route::middleware(['auth', 'verified', 'role:department_coordinator'])->prefix('department')->name('department.')->group(function () {
-    Route::get('/dashboard', function () {
-        return view('department.dashboard');
-    })->name('dashboard');
+Route::middleware(['auth', 'role:department_coordinator'])->prefix('coordinator')->name('coordinator.')->group(function () {
+    Route::get('/dashboard', [\App\Http\Controllers\Dashboard\CoordinatorDashboardController::class, 'index'])->name('dashboard');
+    Route::post('/program/{programId}/update', [\App\Http\Controllers\Dashboard\CoordinatorDashboardController::class, 'updateProgramProgress'])->name('program.update');
 });
 
 // Alumni Routes
-Route::middleware(['auth', 'verified', 'role:alumni'])->name('alumni.')->group(function () {
-    Route::get('/dashboard', function () {
-        return view('alumni.dashboard');
-    })->name('dashboard');
+Route::middleware(['auth', 'role:alumni'])->name('alumni.')->group(function () {
+    Route::get('/dashboard', [\App\Http\Controllers\Dashboard\AlumniDashboardController::class, 'index'])->name('dashboard');
+});
+
+// Placeholder routes for now - will be implemented later
+Route::middleware(['auth'])->group(function () {
+    Route::get('/profile/edit', function() { return view('profile.edit'); })->name('profile.edit');
+    Route::get('/payments', function() { return view('payments.index'); })->name('payments.index');
+    Route::get('/events', function() { return view('events.index'); })->name('events.index');
+    Route::get('/jobs', function() { return view('jobs.index'); })->name('jobs.index');
+    Route::get('/gallery', function() { return view('gallery.index'); })->name('gallery.index');
+    Route::get('/programs', function() { return view('programs.index'); })->name('programs.index');
 });

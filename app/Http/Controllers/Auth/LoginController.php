@@ -27,7 +27,23 @@ class LoginController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
-        $request->validate(User::loginValidationRules());
+        // Debug: Log the request details
+        if (config('app.debug')) {
+            \Log::info('Login attempt', [
+                'login' => $request->input('login'),
+                'csrf_token' => $request->input('_token'),
+                'session_id' => session()->getId(),
+                'request_headers' => $request->headers->all()
+            ]);
+        }
+        
+        $request->validate([
+            'login' => ['required', 'string'],
+            'password' => ['required', 'string'],
+        ], [
+            'login.required' => 'Email/Username/WhatsApp wajib diisi.',
+            'password.required' => 'Password wajib diisi.',
+        ]);
 
         // Check for too many failed attempts
         $failedAttempts = LoginAttempt::getRecentFailedAttempts($request->login);
@@ -46,7 +62,7 @@ class LoginController extends Controller
                 'ip_address' => $request->ip(),
                 'login' => $request->login,
                 'success' => false,
-                'time' => time(),
+                'time' => time(), // Use Unix timestamp
             ]);
 
             return back()->withErrors([
@@ -54,79 +70,44 @@ class LoginController extends Controller
             ])->onlyInput('login');
         }
 
-        // Check if user is active and approved
-        if (!$user->active || !$user->approved) {
-            if (!$user->email_verified_at) {
-                return back()->withErrors([
-                    'login' => 'Silakan verifikasi email Anda terlebih dahulu.',
-                ])->onlyInput('login');
-            } elseif (!$user->approved) {
-                return redirect()->route('approval.pending');
-            } else {
-                return back()->withErrors([
-                    'login' => 'Akun Anda belum diaktivasi. Silakan tunggu persetujuan admin.',
-                ])->onlyInput('login');
-            }
+        // Check if user is active
+        if (!$user->active) {
+            return back()->withErrors([
+                'login' => 'Akun Anda belum diaktivasi. Silakan tunggu persetujuan admin.',
+            ])->onlyInput('login');
         }
 
-        // Attempt to log in
-        if (Auth::attempt($credentials, $request->boolean('remember'))) {
-            $user = Auth::user();
-            
-            // Check if user is active and approved
-            if (!$user->active || !$user->approved) {
-                Auth::logout();
-                if (!$user->email_verified_at) {
-                    return back()->withErrors([
-                        'login' => 'Silakan verifikasi email Anda terlebih dahulu.',
-                    ])->onlyInput('login');
-                } elseif (!$user->approved) {
-                    return redirect()->route('approval.pending');
-                } else {
-                    return back()->withErrors([
-                        'login' => 'Akun Anda belum diaktivasi. Silakan tunggu persetujuan admin.',
-                    ])->onlyInput('login');
-                }
-            }
+        // Log the user in manually
+        Auth::login($user, $request->boolean('remember'));
 
-            // Record successful login
-            LoginAttempt::create([
-                'ip_address' => $request->ip(),
-                'login' => $request->login,
-                'success' => true,
-                'time' => time(),
-            ]);
-
-            // Update user's last login info
-            $user->update([
-                'last_login' => now(),
-                'ip_address' => $request->ip()
-            ]);
-
-            $request->session()->regenerate();
-
-            // Redirect based on role
-            switch ($user->role) {
-                case 'admin':
-                case 'sub_admin':
-                    return redirect()->intended(RouteServiceProvider::ADMIN_HOME);
-                case 'department_coordinator':
-                    return redirect()->intended(RouteServiceProvider::COORDINATOR_HOME);
-                default:
-                    return redirect()->intended(RouteServiceProvider::HOME);
-            }
-        }
-
-        // Record failed login attempt
+        // Record successful login
         LoginAttempt::create([
             'ip_address' => $request->ip(),
             'login' => $request->login,
-            'success' => false,
+            'success' => true,
+            'time' => time(), // Use Unix timestamp
         ]);
 
-        return back()->withErrors([
-            'login' => 'Email/Username atau password salah.',
-        ])->onlyInput('login');
+        // Update user's last login info
+        $user->update([
+            'last_login' => now(),
+        ]);
+
+        $request->session()->regenerate();
+
+        // Redirect based on role
+        switch ($user->role) {
+            case 'admin':
+                return redirect()->intended(route('admin.dashboard'));
+            case 'department_coordinator':
+                return redirect()->intended(route('coordinator.dashboard'));
+            case 'alumni':
+                return redirect()->intended(route('alumni.dashboard'));
+            case 'sub_admin':
+                return redirect()->intended(route('admin.dashboard'));
+            default:
+                return redirect()->intended('/');
+        }
     }
 
     /**
