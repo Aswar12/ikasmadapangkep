@@ -3,123 +3,337 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Models\LoginAttempt;
 use App\Models\User;
-use App\Providers\RouteServiceProvider;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\View\View;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class LoginController extends Controller
 {
     /**
-     * Display the login view.
+     * Create a new controller instance.
+     *
+     * @return void
      */
-    public function create(): View
+    public function __construct()
+    {
+        $this->middleware('guest')->except('logout');
+    }
+
+    /**
+     * Show the login form.
+     *
+     * @return \Illuminate\View\View
+     */
+    public function showLoginForm()
     {
         return view('auth.login');
     }
 
     /**
-     * Handle an incoming authentication request.
+     * Handle a login request to the application.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\JsonResponse
      */
-    public function store(Request $request): RedirectResponse
+    public function login(Request $request)
     {
-        // Debug: Log the request details
-        if (config('app.debug')) {
-            \Log::info('Login attempt', [
-                'login' => $request->input('login'),
-                'csrf_token' => $request->input('_token'),
-                'session_id' => session()->getId(),
-                'request_headers' => $request->headers->all()
-            ]);
+        $this->validateLogin($request);
+
+        // Check rate limiting
+        $this->checkTooManyFailedAttempts($request);
+
+        // Attempt to log the user in
+        if ($this->attemptLogin($request)) {
+            // Reset the rate limiter
+            $this->clearLoginAttempts($request);
+            
+            // Get the authenticated user
+            $user = Auth::user();
+            
+            // Update login information
+            $user->updateLoginInfo();
+            
+            // Regenerate session
+            $request->session()->regenerate();
+
+            // Return response
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Login berhasil! Selamat datang kembali, ' . $user->name,
+                    'redirect' => $this->redirectPath()
+                ]);
+            }
+
+            return redirect()->intended($this->redirectPath())
+                ->with('success', 'Login berhasil! Selamat datang kembali, ' . $user->name);
         }
+
+        // Increment the rate limiter
+        $this->incrementLoginAttempts($request);
+
+        // Find user to check account lock status
+        $identifier = $request->input('login');
+        $user = User::whereIdentifier($identifier)->first();
         
-        $request->validate([
-            'login' => ['required', 'string'],
-            'password' => ['required', 'string'],
-        ], [
-            'login.required' => 'Email/Username/WhatsApp wajib diisi.',
-            'password.required' => 'Password wajib diisi.',
-        ]);
-
-        // Check for too many failed attempts
-        $failedAttempts = LoginAttempt::getRecentFailedAttempts($request->login);
-        if ($failedAttempts >= 5) {
-            return back()->withErrors([
-                'login' => 'Terlalu banyak percobaan login gagal. Silakan coba lagi nanti atau reset password Anda.',
-            ])->onlyInput('login');
+        if ($user) {
+            $user->incrementFailedLoginAttempts();
+            
+            // Lock account if failed attempts reach 5
+            if ($user->failed_login_attempts >= 5 && !$user->login_locked_until) {
+                $user->update(['login_locked_until' => now()->addMinutes(15)]);
+            }
+            
+            if ($user->isAccountLocked()) {
+                $minutes = $user->getLockoutTimeRemaining();
+                $message = "Akun Anda terkunci karena terlalu banyak percobaan login yang gagal. Silakan coba lagi dalam {$minutes} menit.";
+                
+                if ($request->expectsJson()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => $message,
+                        'errors' => ['login' => [$message]]
+                    ], 423);
+                }
+                
+                throw ValidationException::withMessages([
+                    'login' => [$message],
+                ]);
+            }
         }
 
-        // Find user by email, username, or phone
-        $user = User::findForLogin($request->login);
-        
-        if (!$user || !Hash::check($request->password, $user->password)) {
-            // Record failed login attempt
-            LoginAttempt::create([
-                'ip_address' => $request->ip(),
-                'login' => $request->login,
-                'success' => false,
-                'time' => time(), // Use Unix timestamp
-            ]);
-
-            return back()->withErrors([
-                'login' => 'Email/Username/WhatsApp atau kata sandi salah.',
-            ])->onlyInput('login');
-        }
-
-        // Check if user is active
-        if (!$user->active) {
-            return back()->withErrors([
-                'login' => 'Akun Anda belum diaktivasi. Silakan tunggu persetujuan admin.',
-            ])->onlyInput('login');
-        }
-
-        // Log the user in manually
-        Auth::login($user, $request->boolean('remember'));
-
-        // Record successful login
-        LoginAttempt::create([
-            'ip_address' => $request->ip(),
-            'login' => $request->login,
-            'success' => true,
-            'time' => time(), // Use Unix timestamp
-        ]);
-
-        // Update user's last login info
-        $user->update([
-            'last_login' => now(),
-        ]);
-
-        $request->session()->regenerate();
-
-        // Redirect based on role
-        switch ($user->role) {
-            case 'admin':
-                return redirect()->intended(route('admin.dashboard'));
-            case 'department_coordinator':
-                return redirect()->intended(route('coordinator.dashboard'));
-            case 'alumni':
-                return redirect()->intended(route('alumni.dashboard'));
-            case 'sub_admin':
-                return redirect()->intended(route('admin.dashboard'));
-            default:
-                return redirect()->intended('/');
-        }
+        return $this->sendFailedLoginResponse($request);
     }
 
     /**
-     * Destroy an authenticated session.
+     * Validate the user login request.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return void
+     *
+     * @throws \Illuminate\Validation\ValidationException
      */
-    public function destroy(Request $request): RedirectResponse
+    protected function validateLogin(Request $request)
+    {
+        $messages = [
+            'login.required' => 'Email, username, atau nomor WhatsApp wajib diisi.',
+            'password.required' => 'Password wajib diisi.',
+            'password.min' => 'Password minimal :min karakter.',
+            'g-recaptcha-response.required' => 'Mohon verifikasi bahwa Anda bukan robot.',
+            'g-recaptcha-response.captcha' => 'Verifikasi captcha gagal. Silakan coba lagi.',
+        ];
+
+        $rules = [
+            'login' => ['required', 'string'],
+            'password' => ['required', 'string', 'min:6'],
+        ];
+
+        // Add captcha validation if enabled
+        if (config('services.recaptcha.enabled', false)) {
+            $rules['g-recaptcha-response'] = 'required|captcha';
+        }
+
+        $request->validate($rules, $messages);
+
+        // Additional validation for login identifier
+        $login = $request->input('login');
+        
+        // Check if it's email
+        if (filter_var($login, FILTER_VALIDATE_EMAIL)) {
+            // Valid email format
+            return;
+        }
+        
+        // Check if it's username (alphanumeric, min 5 chars)
+        if (preg_match('/^[a-zA-Z0-9_]{5,}$/', $login)) {
+            // Valid username format
+            return;
+        }
+        
+        // Check if it's WhatsApp number
+        if (preg_match('/^(\+62|62|0)[0-9]{8,13}$/', $login)) {
+            // Valid WhatsApp format
+            return;
+        }
+        
+        // If none of the above, throw validation error
+        throw ValidationException::withMessages([
+            'login' => ['Format email, username, atau nomor WhatsApp tidak valid.'],
+        ]);
+    }
+
+    /**
+     * Attempt to log the user into the application.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return bool
+     */
+    protected function attemptLogin(Request $request)
+    {
+        $identifier = $request->input('login');
+        $password = $request->input('password');
+        $remember = $request->boolean('remember');
+
+        // Find user by identifier
+        $user = User::whereIdentifier($identifier)->first();
+
+        if (!$user) {
+            return false;
+        }
+
+        // Check if account is locked
+        if ($user->isAccountLocked()) {
+            return false;
+        }
+
+        // Verify password
+        if (!Hash::check($password, $user->password)) {
+            return false;
+        }
+
+        // Log the user in
+        Auth::login($user, $remember);
+
+        return true;
+    }
+
+    /**
+     * Get the failed login response instance.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Symfony\Component\HttpFoundation\Response
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    protected function sendFailedLoginResponse(Request $request)
+    {
+        $message = 'Email/username/WhatsApp atau password salah.';
+        
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => false,
+                'message' => $message,
+                'errors' => [
+                    'login' => [$message],
+                ]
+            ], 422);
+        }
+
+        throw ValidationException::withMessages([
+            'login' => [$message],
+        ]);
+    }
+
+    /**
+     * The user has been authenticated.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  mixed  $user
+     * @return mixed
+     */
+    protected function authenticated(Request $request, $user)
+    {
+        //
+    }
+
+    /**
+     * Get the post-authentication redirect path.
+     *
+     * @return string
+     */
+    protected function redirectPath()
+    {
+        return '/dashboard';
+    }
+
+    /**
+     * Log the user out of the application.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\JsonResponse
+     */
+    public function logout(Request $request)
     {
         Auth::logout();
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect('/');
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Anda telah berhasil logout.'
+            ]);
+        }
+
+        return redirect('/')
+            ->with('success', 'Anda telah berhasil logout.');
+    }
+
+    /**
+     * Get the rate limiter key for the request.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return string
+     */
+    protected function throttleKey(Request $request)
+    {
+        return Str::lower($request->input('login')) . '|' . $request->ip();
+    }
+
+    /**
+     * Ensure the login request is not rate limited.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return void
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    protected function checkTooManyFailedAttempts(Request $request)
+    {
+        if (!RateLimiter::tooManyAttempts($this->throttleKey($request), 5)) {
+            return;
+        }
+
+        $seconds = RateLimiter::availableIn($this->throttleKey($request));
+        $minutes = ceil($seconds / 60);
+
+        $message = "Terlalu banyak percobaan login. Silakan coba lagi dalam {$minutes} menit.";
+
+        if ($request->expectsJson()) {
+            throw ValidationException::withMessages([
+                'login' => [$message],
+            ])->status(429);
+        }
+
+        throw ValidationException::withMessages([
+            'login' => [$message],
+        ]);
+    }
+
+    /**
+     * Increment the login attempts for the user.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return void
+     */
+    protected function incrementLoginAttempts(Request $request)
+    {
+        RateLimiter::hit($this->throttleKey($request), 60 * 15); // 15 minutes decay
+    }
+
+    /**
+     * Clear the login locks for the given user credentials.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return void
+     */
+    protected function clearLoginAttempts(Request $request)
+    {
+        RateLimiter::clear($this->throttleKey($request));
     }
 }

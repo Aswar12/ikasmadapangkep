@@ -33,6 +33,9 @@ class AlumniDashboardController extends Controller
             ->orderBy('event_date', 'asc')
             ->take(5)
             ->get();
+            
+        // Untuk kompatibilitas dengan template
+        $upcoming_events = $upcomingEvents;
         
         // My registered events
         $myEvents = Event::whereHas('registrations', function ($query) use ($user) {
@@ -55,6 +58,9 @@ class AlumniDashboardController extends Controller
             ->orderBy('created_at', 'desc')
             ->take(5)
             ->get();
+            
+        // Untuk kompatibilitas dengan template
+        $recent_jobs = $latestJobs;
         
         // Latest albums from my year
         $latestAlbums = Album::where('graduation_year', $user->graduation_year)
@@ -72,12 +78,17 @@ class AlumniDashboardController extends Controller
             'payment_status' => $paymentStatus ? $paymentStatus->status : 'belum_bayar',
         ];
         
-        return view('alumni.dashboard.index', [
+        return view('alumni.dashboard', [
             'user' => $user,
             'profile' => $profile,
             'profileCompletion' => $profileCompletion,
+            'profile_completion' => $profileCompletion, // Tambahkan versi snake_case untuk kompatibilitas template
             'paymentStatus' => $paymentStatus,
-            'upcomingEvents' => $upcomingEvents ?? null
+            'payment_info' => $paymentStatus, // Untuk kompatibilitas dengan template
+            'upcomingEvents' => $upcomingEvents ?? null,
+            'upcoming_events' => $upcoming_events ?? null, // Untuk kompatibilitas dengan template
+            'recent_jobs' => $recent_jobs ?? null, // Untuk kompatibilitas dengan template
+            'stats' => $stats ?? []
         ]);
     }
     

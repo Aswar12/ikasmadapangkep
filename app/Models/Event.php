@@ -9,11 +9,6 @@ class Event extends Model
 {
     use HasFactory;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
         'event_name',
         'event_title',
@@ -24,14 +19,10 @@ class Event extends Model
         'ticket_price',
         'quota',
         'poster_image',
-        'created_by'
+        'created_by',
+        'posting_date'
     ];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
     protected $casts = [
         'event_date' => 'datetime',
         'posting_date' => 'datetime',
@@ -39,7 +30,7 @@ class Event extends Model
     ];
 
     /**
-     * Get the creator of the event.
+     * Get the user who created the event.
      */
     public function creator()
     {
@@ -47,10 +38,34 @@ class Event extends Model
     }
 
     /**
-     * Get the registrations for the event.
+     * Get all registrations for the event.
      */
     public function registrations()
     {
         return $this->hasMany(EventRegistration::class);
+    }
+
+    /**
+     * Check if a user is registered for this event.
+     */
+    public function isRegisteredBy($userId)
+    {
+        return $this->registrations()->where('user_id', $userId)->exists();
+    }
+
+    /**
+     * Get the registration count.
+     */
+    public function getRegistrationCountAttribute()
+    {
+        return $this->registrations()->count();
+    }
+
+    /**
+     * Check if event is full.
+     */
+    public function getIsFullAttribute()
+    {
+        return $this->quota && $this->registration_count >= $this->quota;
     }
 }

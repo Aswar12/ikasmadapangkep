@@ -9,18 +9,14 @@ class Profile extends Model
 {
     use HasFactory;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
         'user_id',
         'gender',
         'birth_place',
         'birth_date',
-        'address',
         'national_student_number',
+        'address',
+        'phone_number',
         'father_name',
         'father_occupation',
         'mother_name',
@@ -29,14 +25,9 @@ class Profile extends Model
         'graduation_year',
         'diploma_number',
         'certificate_number',
-        'profile_photo',
+        'profile_photo'
     ];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
     protected $casts = [
         'birth_date' => 'date',
     ];

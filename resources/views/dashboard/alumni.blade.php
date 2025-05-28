@@ -1,20 +1,77 @@
-@extends('layouts.main')
+@extends('layouts.dashboard')
+
+@section('navigation')
+<ul class="space-y-1">
+    <li>
+        <a href="{{ route('alumni.dashboard') }}" class="flex items-center {{ request()->routeIs('alumni.dashboard') ? 'bg-blue-50 text-blue-900 font-bold' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }} rounded-xl py-3 px-4">
+            <i class="fas fa-home w-6"></i>
+            <span>Dashboard</span>
+        </a>
+    </li>
+
+    <!-- Profile -->
+    <li>
+        <a href="{{ route('profile.show') }}" class="flex items-center text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-xl py-3 px-4">
+            <i class="fas fa-user w-6"></i>
+            <span>Profile Saya</span>
+        </a>
+    </li>
+
+    <!-- Events -->
+    <li>
+        <a href="{{ route('events.index') }}" class="flex items-center text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-xl py-3 px-4">
+            <i class="fas fa-calendar-alt w-6"></i>
+            <span>Event</span>
+        </a>
+    </li>
+
+    <!-- Alumni Directory -->
+    <li>
+        <a href="#" class="flex items-center text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-xl py-3 px-4">
+            <i class="fas fa-users w-6"></i>
+            <span>Direktori Alumni</span>
+        </a>
+    </li>
+
+    <!-- Gallery -->
+    <li>
+        <a href="{{ route('gallery.index') }}" class="flex items-center text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-xl py-3 px-4">
+            <i class="fas fa-images w-6"></i>
+            <span>Galeri</span>
+        </a>
+    </li>
+
+    <!-- Finance -->
+    <li>
+        <a href="#" class="flex items-center text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-xl py-3 px-4">
+            <i class="fas fa-wallet w-6"></i>
+            <span>Keuangan</span>
+        </a>
+    </li>
+</ul>
+@endsection
 
 @section('content')
 <div class="py-12">
     <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-        <!-- Header -->
-        <div class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-900">Dashboard Alumni</h1>
-            <p class="text-gray-600 mt-2">Selamat datang kembali, {{ $user->name }}!</p>
+        <!-- Welcome Banner -->
+        <div class="bg-gradient-to-r from-blue-600 to-blue-800 rounded-xl shadow-lg p-8 text-white mb-8">
+            <div class="flex items-center justify-between">
+                <div class="space-y-2">
+                    <h1 class="text-3xl font-bold">Selamat Datang, {{ $user->name }}! 👋</h1>
+                    <p class="text-blue-100">Tetap terhubung dengan komunitas alumni SMADA Pangkep</p>
+                </div>
+                <img src="{{ Auth::user()->profile_photo_url }}" alt="{{ Auth::user()->name }}" 
+                     class="h-24 w-24 rounded-xl border-4 border-white/20 shadow-lg hidden md:block">
+            </div>
         </div>
 
         <!-- Quick Stats -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <div class="bg-white overflow-hidden shadow-sm rounded-lg">
+            <div class="bg-white overflow-hidden shadow-sm rounded-xl border border-gray-100 hover:shadow-md transition-shadow">
                 <div class="p-6">
                     <div class="flex items-center">
-                        <div class="flex-shrink-0 bg-blue-500 rounded-md p-3">
+                        <div class="flex-shrink-0 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-3 shadow-lg">
                             <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                             </svg>
@@ -22,7 +79,12 @@
                         <div class="ml-5 w-0 flex-1">
                             <dl>
                                 <dt class="text-sm font-medium text-gray-500 truncate">Kelengkapan Profil</dt>
-                                <dd class="text-lg font-medium text-gray-900">{{ $stats['profile_completion'] }}%</dd>
+                                <dd class="mt-1 text-lg font-semibold text-gray-900 flex items-center">
+                                    {{ $stats['profile_completion'] }}%
+                                    <div class="ml-2 w-20 h-1.5 bg-gray-200 rounded-full">
+                                        <div class="h-1.5 bg-blue-500 rounded-full" style="width: {{ $stats['profile_completion'] }}%"></div>
+                                    </div>
+                                </dd>
                             </dl>
                         </div>
                     </div>
@@ -115,16 +177,17 @@
 
         <!-- Payment Alert -->
         @if($stats['payment_status'] == 'belum_bayar')
-        <div class="bg-red-50 border-l-4 border-red-400 p-4 mb-8">
-            <div class="flex">
-                <div class="flex-shrink-0">
-                    <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+        <div class="bg-gradient-to-r from-red-50 to-red-100 rounded-xl border border-red-200 p-6 mb-8">
+            <div class="flex items-center">
+                <div class="flex-shrink-0 bg-red-100 rounded-xl p-3">
+                    <svg class="h-6 w-6 text-red-600" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
                     </svg>
                 </div>
-                <div class="ml-3">
-                    <p class="text-sm text-red-700">
-                        Iuran tahunan {{ date('Y') }} Anda belum dibayar. 
+                <div class="ml-5">
+                    <h3 class="text-lg font-semibold text-gray-900">Iuran Belum Dibayar</h3>
+                    <p class="mt-1 text-sm text-gray-600">
+                        Iuran tahunan tahun {{ date('Y') }} Anda belum dibayar. 
                         <a href="{{ route('payments.index') }}" class="font-medium underline text-red-700 hover:text-red-600">
                             Bayar sekarang
                         </a>
@@ -132,23 +195,72 @@
                 </div>
             </div>
         </div>
-        @endif
-
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <!-- Upcoming Events -->
-            <div class="bg-white overflow-hidden shadow-sm rounded-lg">
-                <div class="p-6">
-                    <div class="flex justify-between items-center mb-4">
-                        <h2 class="text-lg font-medium text-gray-900">Event Mendatang</h2>
-                        <a href="{{ route('events.index') }}" class="text-sm text-blue-600 hover:text-blue-700">Lihat Semua</a>
+        @endif            <!-- Quick Actions -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                <a href="{{ route('events.index') }}" class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 hover:border-blue-500 hover:shadow-md transition-all group">
+                    <div class="flex items-center space-x-3">
+                        <div class="bg-gradient-to-br from-blue-100 to-blue-50 p-3 rounded-lg group-hover:scale-110 transition-transform">
+                            <i class="fas fa-calendar text-blue-600"></i>
+                        </div>
+                        <span class="font-medium text-gray-700">Event</span>
                     </div>
-                    @if($upcomingEvents->count() > 0)
+                </a>
+                
+                <a href="#" class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 hover:border-purple-500 hover:shadow-md transition-all group">
+                    <div class="flex items-center space-x-3">
+                        <div class="bg-gradient-to-br from-purple-100 to-purple-50 p-3 rounded-lg group-hover:scale-110 transition-transform">
+                            <i class="fas fa-users text-purple-600"></i>
+                        </div>
+                        <span class="font-medium text-gray-700">Alumni</span>
+                    </div>
+                </a>
+                
+                <a href="#" class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 hover:border-green-500 hover:shadow-md transition-all group">
+                    <div class="flex items-center space-x-3">
+                        <div class="bg-gradient-to-br from-green-100 to-green-50 p-3 rounded-lg group-hover:scale-110 transition-transform">
+                            <i class="fas fa-wallet text-green-600"></i>
+                        </div>
+                        <span class="font-medium text-gray-700">Iuran</span>
+                    </div>
+                </a>
+                
+                <a href="{{ route('gallery.index') }}" class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 hover:border-yellow-500 hover:shadow-md transition-all group">
+                    <div class="flex items-center space-x-3">
+                        <div class="bg-gradient-to-br from-yellow-100 to-yellow-50 p-3 rounded-lg group-hover:scale-110 transition-transform">
+                            <i class="fas fa-images text-yellow-600"></i>
+                        </div>
+                        <span class="font-medium text-gray-700">Galeri</span>
+                    </div>
+                </a>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Upcoming Events -->
+                <div class="bg-white overflow-hidden shadow-sm rounded-xl border border-gray-100">
+                    <div class="p-6">
+                        <div class="flex justify-between items-center mb-6">
+                            <div>
+                                <h2 class="text-lg font-semibold text-gray-900">Event Mendatang</h2>
+                                <p class="text-sm text-gray-500">Acara yang akan datang</p>
+                            </div>
+                            <a href="{{ route('events.index') }}" class="text-sm text-blue-600 hover:text-blue-700 hover:underline">Lihat Semua</a>
+                        </div>
+                        @if($upcomingEvents->count() > 0)
                         <div class="space-y-4">
                             @foreach($upcomingEvents as $event)
-                            <div class="border-l-4 border-blue-500 pl-4 py-2">
-                                <h3 class="font-medium text-gray-900">{{ $event->event_title }}</h3>
-                                <p class="text-sm text-gray-500">{{ $event->event_date->format('d M Y, H:i') }}</p>
-                                <p class="text-sm text-gray-600">{{ $event->location }}</p>
+                            <div class="flex items-start space-x-4 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                                <div class="flex-shrink-0 w-12 text-center">
+                                    <span class="block text-lg font-bold text-gray-900">{{ $event->event_date->format('d') }}</span>
+                                    <span class="block text-xs font-medium text-gray-600">{{ $event->event_date->format('M') }}</span>
+                                </div>
+                                <div class="flex-1">
+                                    <h3 class="font-medium text-gray-900">{{ $event->event_title }}</h3>
+                                    <p class="text-sm text-gray-600 mt-1">{{ $event->location }}</p>
+                                    <div class="flex items-center mt-2 text-xs text-gray-500">
+                                        <i class="far fa-clock mr-1"></i>
+                                        {{ $event->event_date->format('H:i') }} WIB
+                                    </div>
+                                </div>
                             </div>
                             @endforeach
                         </div>
@@ -159,20 +271,35 @@
             </div>
 
             <!-- Latest Job Vacancies -->
-            <div class="bg-white overflow-hidden shadow-sm rounded-lg">
+            <div class="bg-white overflow-hidden shadow-sm rounded-xl border border-gray-100">
                 <div class="p-6">
-                    <div class="flex justify-between items-center mb-4">
-                        <h2 class="text-lg font-medium text-gray-900">Lowongan Kerja Terbaru</h2>
-                        <a href="{{ route('jobs.index') }}" class="text-sm text-blue-600 hover:text-blue-700">Lihat Semua</a>
+                    <div class="flex justify-between items-center mb-6">
+                        <div>
+                            <h2 class="text-lg font-semibold text-gray-900">Lowongan Kerja</h2>
+                            <p class="text-sm text-gray-500">Peluang karir terbaru</p>
+                        </div>
+                        <a href="{{ route('jobs.index') }}" class="text-sm text-blue-600 hover:text-blue-700 hover:underline">Lihat Semua</a>
                     </div>
                     @if($latestJobs->count() > 0)
                         <div class="space-y-4">
                             @foreach($latestJobs as $job)
-                            <div class="border-l-4 border-green-500 pl-4 py-2">
-                                <h3 class="font-medium text-gray-900">{{ $job->position }}</h3>
-                                <p class="text-sm text-gray-600">{{ $job->company_name }}</p>
-                                <p class="text-sm text-gray-500">{{ $job->location }}</p>
-                                <p class="text-xs text-gray-400">Deadline: {{ $job->application_deadline->format('d M Y') }}</p>
+                            <div class="p-4 bg-white border border-gray-100 rounded-lg hover:shadow-md transition-shadow">
+                                <div class="flex items-start justify-between">
+                                    <div>
+                                        <h3 class="font-medium text-gray-900">{{ $job->position }}</h3>
+                                        <div class="flex items-center mt-2 text-sm text-gray-600">
+                                            <i class="fas fa-building mr-2"></i>
+                                            {{ $job->company_name }}
+                                        </div>
+                                        <div class="flex items-center mt-1 text-sm text-gray-600">
+                                            <i class="fas fa-map-marker-alt mr-2"></i>
+                                            {{ $job->location }}
+                                        </div>
+                                    </div>
+                                    <span class="px-3 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">
+                                        {{ $job->application_deadline->diffForHumans() }}
+                                    </span>
+                                </div>
                             </div>
                             @endforeach
                         </div>
@@ -216,25 +343,46 @@
         </div>
 
         <!-- Latest Program Kerja Updates -->
-        <div class="mt-8 bg-white overflow-hidden shadow-sm rounded-lg">
+        <div class="mt-8 bg-white overflow-hidden shadow-sm rounded-xl border border-gray-100">
             <div class="p-6">
-                <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-lg font-medium text-gray-900">Update Program Kerja</h2>
-                    <a href="{{ route('programs.index') }}" class="text-sm text-blue-600 hover:text-blue-700">Lihat Semua</a>
+                <div class="flex justify-between items-center mb-6">
+                    <div>
+                        <h2 class="text-lg font-semibold text-gray-900">Update Program Kerja</h2>
+                        <p class="text-sm text-gray-500">Progress kegiatan terkini</p>
+                    </div>
+                    <a href="{{ route('programs.index') }}" class="text-sm text-blue-600 hover:text-blue-700 hover:underline">Lihat Semua</a>
                 </div>
                 @if($latestPrograms->count() > 0)
-                    <div class="space-y-4">
+                    <div class="space-y-6">
                         @foreach($latestPrograms as $program)
-                        <div class="flex items-center justify-between">
-                            <div class="flex-1">
-                                <h3 class="font-medium text-gray-900">{{ $program->name }}</h3>
-                                <p class="text-sm text-gray-600">{{ $program->department->name }}</p>
-                            </div>
-                            <div class="ml-4">
-                                <div class="w-32 bg-gray-200 rounded-full h-2">
-                                    <div class="bg-blue-600 h-2 rounded-full" style="width: {{ $program->progress_percentage }}%"></div>
+                        <div class="p-4 bg-white border border-gray-100 rounded-lg hover:shadow-md transition-shadow">
+                            <div class="flex items-start justify-between mb-4">
+                                <div class="flex-1">
+                                    <h3 class="font-medium text-gray-900">{{ $program->name }}</h3>
+                                    <div class="flex items-center mt-2 text-sm text-gray-600">
+                                        <i class="fas fa-sitemap mr-2"></i>
+                                        {{ $program->department->name }}
+                                    </div>
                                 </div>
-                                <p class="text-xs text-gray-500 mt-1 text-center">{{ $program->progress_percentage }}%</p>
+                                <span class="ml-4 px-3 py-1 text-xs font-medium rounded-full
+                                    {{ $program->progress_percentage < 30 ? 'bg-red-100 text-red-800' : 
+                                       ($program->progress_percentage < 70 ? 'bg-yellow-100 text-yellow-800' : 
+                                        'bg-green-100 text-green-800') }}">
+                                    {{ $program->progress_percentage }}% Selesai
+                                </span>
+                            </div>
+                            <div class="relative pt-1">
+                                <div class="flex mb-2 items-center justify-between">
+                                    <div class="text-xs text-gray-500">Progress</div>
+                                </div>
+                                <div class="overflow-hidden h-2 text-xs flex rounded-full bg-gray-100">
+                                    <div class="transition-all duration-500 ease-out 
+                                        {{ $program->progress_percentage < 30 ? 'bg-red-500' : 
+                                           ($program->progress_percentage < 70 ? 'bg-yellow-500' : 
+                                            'bg-green-500') }}"
+                                        style="width: {{ $program->progress_percentage }}%">
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         @endforeach

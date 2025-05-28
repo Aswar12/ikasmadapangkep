@@ -21,7 +21,7 @@
     }
 </style>
 
-<div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 relative overflow-hidden">
+<div class="min-h-screen flex flex-col justify-center items-center p-4 sm:p-6 lg:p-8 relative overflow-hidden">
     <!-- Background Slider -->
     <div class="absolute inset-0 z-0">
         <div class="hero-slider relative w-full h-full">
@@ -35,41 +35,38 @@
             <div class="hero-slide absolute inset-0 bg-cover bg-center transition-opacity duration-1000" 
                 style="background-image: url('{{ asset('images/DSC03049.JPG') }}');"></div>
             
-            <!-- Overlay untuk membuat background lebih gelap -->
+            <!-- Dark overlay with gradient -->
             <div class="absolute inset-0 bg-gradient-to-br from-gray-900/80 via-gray-900/70 to-gray-900/80"></div>
         </div>
-        
-        <!-- Slider Controls -->
-        <div class="absolute inset-x-0 bottom-4 flex justify-center space-x-2 z-20">
-            <button class="hero-control prev p-2 rounded-full bg-gray-800/50 hover:bg-gray-800/70 text-white transition-colors">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-                </svg>
-            </button>
-            <button class="hero-control next p-2 rounded-full bg-gray-800/50 hover:bg-gray-800/70 text-white transition-colors">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                </svg>
-            </button>
+    </div>
+
+    <!-- Main Container -->
+    <div class="relative z-10 w-full max-w-md mx-auto space-y-6">
+        <!-- Logo -->
+        <div class="flex justify-center mb-8">
+            {{ $logo }}
         </div>
-    </div>
 
-    <div class="relative z-10 mb-6">
-        {{ $logo }}
-    </div>
+        <!-- Content Card -->
+        <div class="auth-card p-6 sm:p-8 lg:p-10 w-full">
+            <!-- Header -->
+            <div class="text-center mb-8">
+                <h1 class="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">IKA SMADA Pangkep</h1>
+                <p class="text-gray-600 text-sm sm:text-base">Sistem Informasi Organisasi Alumni</p>
+            </div>
+            
+            {{ $slot }}
+        </div>
 
-    <div class="w-full sm:max-w-2xl mt-6 px-6 py-8 bg-white/90 backdrop-blur-md shadow-xl rounded-2xl relative z-10">
-        {{ $slot }}
-    </div>
-
-    <!-- Footer Text -->
-    <div class="mt-8 text-center relative z-10 space-y-1">
-        <p class="text-sm font-medium text-white/90 drop-shadow-md">
-            &copy; {{ date('Y') }} IKA SMADA Pangkep. All rights reserved.
-        </p>
-        <p class="text-xs text-white/80 drop-shadow-md">
-            Developed by Departemen Humas dan Jaringan
-        </p>
+        <!-- Footer Text -->
+        <div class="text-center space-y-2 mt-6">
+            <p class="text-sm font-medium text-white/90 drop-shadow-md">
+                &copy; {{ date('Y') }} IKA SMADA Pangkep. All rights reserved.
+            </p>
+            <p class="text-xs text-white/80 drop-shadow-md">
+                Developed by Departemen Humas dan Jaringan
+            </p>
+        </div>
     </div>
 </div>
 

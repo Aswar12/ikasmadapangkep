@@ -2,24 +2,15 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Validation\Rules;
-use Laravel\Fortify\TwoFactorAuthenticatable;
-use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
-
-    /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory;
-    use HasProfilePhoto;
-    use Notifiable;
-    use TwoFactorAuthenticatable;
 
     /**
      * The attributes that are mass assignable.
@@ -30,16 +21,12 @@ class User extends Authenticatable
         'name',
         'email',
         'username',
-        'phone',
+        'whatsapp',
         'password',
-        'graduation_year',
-        'role',
-        'active',
-        'approved',
-        'registration_date',
-        'email_verified_at',
-        'last_login',
-        'current_job',
+        'last_login_at',
+        'login_count',
+        'failed_login_attempts',
+        'login_locked_until',
     ];
 
     /**
@@ -50,160 +37,228 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
-        'two_factor_recovery_codes',
-        'two_factor_secret',
     ];
 
     /**
-     * The accessors to append to the model's array form.
+     * The attributes that should be cast.
      *
-     * @var array<int, string>
+     * @var array<string, string>
      */
-    protected $appends = [
-        'profile_photo_url',
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'last_login_at' => 'datetime',
+        'login_locked_until' => 'datetime',
+        'login_count' => 'integer',
+        'failed_login_attempts' => 'integer',
     ];
 
     /**
-     * Get the attributes that should be cast.
+     * Mutator to set WhatsApp number.
+     * Normalizes the number to a standard format.
      *
-     * @return array<string, string>
+     * @param string|null $value
+     * @return void
      */
-    protected function casts(): array
+    public function setWhatsappAttribute($value)
     {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
+        if ($value) {
+            // Remove any non-numeric characters
+            $value = preg_replace('/[^0-9]/', '', $value);
+            
+            // Convert 628xx to 08xx for storage
+            if (substr($value, 0, 3) === '628') {
+                $value = '08' . substr($value, 3);
+            }
+        }
+        
+        $this->attributes['whatsapp'] = $value;
     }
 
     /**
-     * Check if the user has a specific role.
+     * Accessor to get formatted WhatsApp number.
+     *
+     * @param string|null $value
+     * @return string|null
      */
-    public function hasRole(string $role): bool
+    public function getWhatsappFormattedAttribute()
     {
-        return $this->role === $role;
+        if (!$this->whatsapp) {
+            return null;
+        }
+        
+        // Format as +628xxx-xxxx-xxxx
+        $number = $this->whatsapp;
+        if (substr($number, 0, 2) === '08') {
+            $number = '628' . substr($number, 2);
+        }
+        
+        // Add formatting
+        if (strlen($number) >= 11) {
+            return '+' . substr($number, 0, 4) . '-' . 
+                   substr($number, 4, 4) . '-' . 
+                   substr($number, 8);
+        }
+        
+        return '+' . $number;
     }
 
     /**
-     * Check if the user has any of the given roles.
+     * Check if user account is locked due to failed login attempts.
+     *
+     * @return bool
      */
-    public function hasAnyRole(array $roles): bool
+    public function isAccountLocked(): bool
     {
-        return in_array($this->role, $roles);
+        return $this->failed_login_attempts >= 5 || 
+               ($this->login_locked_until && $this->login_locked_until->isFuture());
     }
 
     /**
-     * Check if the user is an admin (including sub-admin).
+     * Get the lockout time remaining in minutes.
+     *
+     * @return int
      */
-    public function isAdmin(): bool
+    public function getLockoutTimeRemaining(): int
     {
-        return $this->hasAnyRole(['admin', 'sub_admin']);
+        if (!$this->isAccountLocked()) {
+            return 0;
+        }
+        
+        if ($this->login_locked_until && $this->login_locked_until->isFuture()) {
+            return max(0, now()->diffInMinutes($this->login_locked_until, false));
+        }
+        
+        // Assuming 15 minutes lockout from last failed attempt
+        $lockoutMinutes = 15;
+        $lastAttempt = $this->updated_at;
+        $unlockTime = $lastAttempt->addMinutes($lockoutMinutes);
+        
+        return max(0, now()->diffInMinutes($unlockTime, false));
     }
 
     /**
-     * Check if the user is a department coordinator.
+     * Reset failed login attempts.
+     *
+     * @return void
      */
-    public function isDepartmentCoordinator(): bool
+    public function resetFailedLoginAttempts(): void
     {
-        return $this->hasRole('department_coordinator');
+        $this->update([
+            'failed_login_attempts' => 0,
+            'login_locked_until' => null
+        ]);
     }
 
     /**
-     * Check if the user is a regular alumni.
+     * Increment failed login attempts.
+     *
+     * @return void
      */
-    public function isAlumni(): bool
+    public function incrementFailedLoginAttempts(): void
     {
-        return $this->hasRole('alumni');
+        $this->increment('failed_login_attempts');
     }
 
     /**
-     * Find user by login identifier (email, username, or phone)
+     * Update last login information.
+     *
+     * @return void
      */
-    public static function findForLogin($login)
+    public function updateLoginInfo(): void
     {
-        return static::where('email', $login)
-            ->orWhere('username', $login)
-            ->orWhere('phone', $login)
-            ->first();
+        $this->update([
+            'last_login_at' => now(),
+            'login_count' => $this->login_count + 1,
+            'failed_login_attempts' => 0,
+            'login_locked_until' => null,
+        ]);
     }
 
     /**
-     * Custom login validation rules
+     * Get display identifier (username, email, or formatted whatsapp).
+     *
+     * @return string
      */
-    public static function loginValidationRules(): array
+    public function getDisplayIdentifierAttribute(): string
     {
-        return [
-            'login' => ['required', 'string'],
-            'password' => ['required', 'string'],
-        ];
+        if ($this->username) {
+            return $this->username;
+        }
+        
+        if ($this->whatsapp) {
+            return $this->whatsapp_formatted;
+        }
+        
+        return $this->email;
     }
 
     /**
-     * Custom registration validation rules
+     * Scope a query to search users by identifier.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param string $identifier
+     * @return \Illuminate\Database\Eloquent\Builder
      */
-    public static function registrationValidationRules(): array
+    public function scopeWhereIdentifier($query, $identifier)
     {
-        return [
-            'name' => ['required', 'string', 'max:255'],
-            'username' => [
-                'required',
-                'string',
-                'max:255',
-                'unique:users',
-                'regex:/^[a-zA-Z0-9_-]+$/',
-            ],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'phone' => [
-                'required',
-                'string',
-                'max:20',
-                'unique:users',
-                'regex:/^(\+62|62|0)8[1-9][0-9]{6,9}$/'
-            ],
-            'graduation_year' => ['required', 'string', 'max:4'],
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'current_job' => ['nullable', 'string', 'max:255'],
-        ];
+        return $query->where(function ($q) use ($identifier) {
+            // Selalu cek email
+            $q->where('email', $identifier);
+            
+            // Cek username jika kolom ada
+            if (\Illuminate\Support\Facades\Schema::hasColumn('users', 'username')) {
+                $q->orWhere('username', $identifier);
+            }
+            
+            // Cek whatsapp jika kolom ada
+            if (\Illuminate\Support\Facades\Schema::hasColumn('users', 'whatsapp')) {
+                // Normalize WhatsApp number jika terlihat seperti nomor HP
+                if (preg_match('/^(\+62|62|0)[0-9]+$/', $identifier)) {
+                    $whatsapp = preg_replace('/[^0-9]/', '', $identifier);
+                    
+                    // Konversi 628xxx ke 08xxx untuk pencocokan
+                    if (substr($whatsapp, 0, 3) === '628') {
+                        $whatsapp = '08' . substr($whatsapp, 3);
+                    }
+                    // Konversi 62xxx ke 08xxx
+                    if (substr($whatsapp, 0, 2) === '62' && strlen($whatsapp) > 10) {
+                        $whatsapp = '08' . substr($whatsapp, 2);
+                    }
+                    
+                    $q->orWhere('whatsapp', $whatsapp)
+                      ->orWhere('whatsapp', $identifier); // Coba juga format asli
+                } else {
+                    $q->orWhere('whatsapp', $identifier);
+                }
+            }
+            
+            // Fallback ke kolom phone jika whatsapp tidak ada
+            if (!\Illuminate\Support\Facades\Schema::hasColumn('users', 'whatsapp') && 
+                \Illuminate\Support\Facades\Schema::hasColumn('users', 'phone')) {
+                if (preg_match('/^(\+62|62|0)[0-9]+$/', $identifier)) {
+                    $phone = preg_replace('/[^0-9]/', '', $identifier);
+                    if (substr($phone, 0, 3) === '628') {
+                        $phone = '08' . substr($phone, 3);
+                    }
+                    if (substr($phone, 0, 2) === '62' && strlen($phone) > 10) {
+                        $phone = '08' . substr($phone, 2);
+                    }
+                    $q->orWhere('phone', $phone)
+                      ->orWhere('phone', $identifier);
+                } else {
+                    $q->orWhere('phone', $identifier);
+                }
+            }
+        });
     }
-
+    
     /**
-     * Get the validation error messages.
-     */
-    public static function validationMessages(): array
-    {
-        return [
-            'username.unique' => 'Username sudah digunakan.',
-            'username.regex' => 'Username hanya boleh berisi huruf, angka, tanda hubung (-), dan garis bawah (_).',
-            'email.unique' => 'Email sudah digunakan.',
-            'phone.unique' => 'Nomor WhatsApp sudah digunakan.',
-            'phone.regex' => 'Format nomor WhatsApp tidak valid. Gunakan format: 08xx atau +62xx.',
-            'password.confirmed' => 'Konfirmasi kata sandi tidak cocok.',
-            'graduation_year.required' => 'Tahun kelulusan wajib diisi.',
-        ];
-    }
-
-    /**
-     * Relationships
+     * Get all event registrations for the user.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function eventRegistrations()
     {
         return $this->hasMany(EventRegistration::class);
-    }
-
-    public function departments()
-    {
-        return $this->belongsToMany(Department::class, 'user_departments')
-                    ->withPivot('is_coordinator')
-                    ->withTimestamps();
-    }
-
-    public function payments()
-    {
-        return $this->hasMany(Payment::class);
-    }
-
-    public function profile()
-    {
-        return $this->hasOne(Profile::class);
     }
 }
