@@ -9,7 +9,7 @@ class ProgramKerja extends Model
 {
     use HasFactory;
 
-    protected $table = 'program_kerja';
+    protected $table = 'programs';
 
     /**
      * The attributes that are mass assignable.

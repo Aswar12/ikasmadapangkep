@@ -7,10 +7,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Laravel\Jetstream\HasProfilePhoto;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable, HasProfilePhoto;
 
     /**
      * The attributes that are mass assignable.
@@ -260,5 +261,144 @@ class User extends Authenticatable
     public function eventRegistrations()
     {
         return $this->hasMany(EventRegistration::class);
+    }
+    
+    /**
+     * Get the URL to the user's profile photo.
+     *
+     * @return string
+     */
+    public function getProfilePhotoUrlAttribute()
+    {
+        // Check if user has profile photo in profiles table
+        $profile = \App\Models\Profile::where('user_id', $this->id)->first();
+        
+        if ($profile && $profile->profile_photo) {
+            // Check if photo is stored in public folder directly
+            if (file_exists(public_path($profile->profile_photo))) {
+                return asset($profile->profile_photo);
+            }
+            // Check if photo is in storage folder
+            elseif (\Illuminate\Support\Facades\Storage::disk('public')->exists($profile->profile_photo)) {
+                return asset('storage/' . $profile->profile_photo);
+            }
+        }
+        
+        // Return default avatar
+        return 'https://ui-avatars.com/api/?name=' . urlencode($this->name) . '&color=7F9CF5&background=EBF4FF';
+    }
+    
+    /**
+     * Update the user's profile photo.
+     *
+     * @param  \Illuminate\Http\UploadedFile  $photo
+     * @return void
+     */
+    public function updateProfilePhoto($photo)
+    {
+        // Get or create profile
+        $profile = \App\Models\Profile::firstOrCreate(
+            ['user_id' => $this->id],
+            ['user_id' => $this->id]
+        );
+        
+        // Delete old photo if exists
+        if ($profile->profile_photo) {
+            // Delete from storage
+            if (\Illuminate\Support\Facades\Storage::disk('public')->exists($profile->profile_photo)) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($profile->profile_photo);
+            }
+            // Also delete from public folder if exists
+            $oldPublicPath = public_path($profile->profile_photo);
+            if (file_exists($oldPublicPath)) {
+                unlink($oldPublicPath);
+            }
+        }
+        
+        try {
+            // Check if photo is valid
+            if (!$photo || !$photo->isValid() || $photo->getSize() == 0) {
+                throw new \Exception('Invalid or empty file');
+            }
+            
+            // Use manual approach for better compatibility with Windows
+            $storageDir = public_path('profile-photos');
+            
+            // Create directory if not exists
+            if (!is_dir($storageDir)) {
+                if (!mkdir($storageDir, 0755, true)) {
+                    throw new \Exception('Failed to create storage directory');
+                }
+            }
+            
+            // Check if directory is writable
+            if (!is_writable($storageDir)) {
+                throw new \Exception('Storage directory is not writable');
+            }
+            
+            // Generate filename
+            $extension = strtolower($photo->getClientOriginalExtension()) ?: 'jpg';
+            $filename = 'profile_' . $this->id . '_' . time() . '.' . $extension;
+            $relativePath = 'profile-photos/' . $filename;
+            $fullPath = $storageDir . DIRECTORY_SEPARATOR . $filename;
+            
+            // Log attempt
+            \Illuminate\Support\Facades\Log::info('Attempting to save profile photo', [
+                'user_id' => $this->id,
+                'filename' => $filename,
+                'storage_dir' => $storageDir,
+                'full_path' => $fullPath,
+                'temp_path' => $photo->getRealPath(),
+                'file_size' => $photo->getSize()
+            ]);
+            
+            // Move file to public directory
+            if (!$photo->move($storageDir, $filename)) {
+                throw new \Exception('Failed to move uploaded file');
+            }
+            
+            // Verify file exists
+            if (!file_exists($fullPath)) {
+                throw new \Exception('File not found after moving');
+            }
+            
+            // Update profile
+            $profile->update([
+                'profile_photo' => $relativePath
+            ]);
+            
+            \Illuminate\Support\Facades\Log::info('Profile photo saved successfully', [
+                'user_id' => $this->id,
+                'path' => $relativePath
+            ]);
+            
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Failed to store profile photo in User model', [
+                'user_id' => $this->id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            throw $e;
+        }
+    }
+    
+    /**
+     * Delete the user's profile photo.
+     *
+     * @return void
+     */
+    public function deleteProfilePhoto()
+    {
+        $profile = \App\Models\Profile::where('user_id', $this->id)->first();
+        
+        if ($profile && $profile->profile_photo) {
+            // Delete file
+            \Illuminate\Support\Facades\Storage::disk('public')->delete($profile->profile_photo);
+            
+            // Update database
+            $profile->update([
+                'profile_photo' => null
+            ]);
+        }
     }
 }

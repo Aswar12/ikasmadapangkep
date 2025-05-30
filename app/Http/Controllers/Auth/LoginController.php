@@ -43,19 +43,22 @@ class LoginController extends Controller
     {
         $this->validateLogin($request);
 
-        // Check rate limiting
-        $this->checkTooManyFailedAttempts($request);
+        // DISABLED - Check rate limiting
+        // $this->checkTooManyFailedAttempts($request);
 
         // Attempt to log the user in
         if ($this->attemptLogin($request)) {
-            // Reset the rate limiter
-            $this->clearLoginAttempts($request);
+            // DISABLED - Reset the rate limiter
+            // $this->clearLoginAttempts($request);
             
             // Get the authenticated user
             $user = Auth::user();
             
-            // Update login information
-            $user->updateLoginInfo();
+            // Update login information (but skip failed attempts reset)
+            $user->update([
+                'last_login_at' => now(),
+                'login_count' => $user->login_count + 1,
+            ]);
             
             // Regenerate session
             $request->session()->regenerate();
@@ -73,38 +76,32 @@ class LoginController extends Controller
                 ->with('success', 'Login berhasil! Selamat datang kembali, ' . $user->name);
         }
 
-        // Increment the rate limiter
-        $this->incrementLoginAttempts($request);
+        // DISABLED - Increment the rate limiter
+        // $this->incrementLoginAttempts($request);
 
-        // Find user to check account lock status
-        $identifier = $request->input('login');
-        $user = User::whereIdentifier($identifier)->first();
-        
-        if ($user) {
-            $user->incrementFailedLoginAttempts();
-            
-            // Lock account if failed attempts reach 5
-            if ($user->failed_login_attempts >= 5 && !$user->login_locked_until) {
-                $user->update(['login_locked_until' => now()->addMinutes(15)]);
-            }
-            
-            if ($user->isAccountLocked()) {
-                $minutes = $user->getLockoutTimeRemaining();
-                $message = "Akun Anda terkunci karena terlalu banyak percobaan login yang gagal. Silakan coba lagi dalam {$minutes} menit.";
-                
-                if ($request->expectsJson()) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => $message,
-                        'errors' => ['login' => [$message]]
-                    ], 423);
-                }
-                
-                throw ValidationException::withMessages([
-                    'login' => [$message],
-                ]);
-            }
-        }
+        // DISABLED - Find user to check account lock status and increment failed attempts
+        // $identifier = $request->input('login');
+        // $user = User::whereIdentifier($identifier)->first();
+        // if ($user) {
+        //     $user->incrementFailedLoginAttempts();
+        //     if ($user->failed_login_attempts >= 5 && !$user->login_locked_until) {
+        //         $user->update(['login_locked_until' => now()->addMinutes(15)]);
+        //     }
+        //     if ($user->isAccountLocked()) {
+        //         $minutes = $user->getLockoutTimeRemaining();
+        //         $message = "Akun Anda terkunci karena terlalu banyak percobaan login yang gagal. Silakan coba lagi dalam {$minutes} menit.";
+        //         if ($request->expectsJson()) {
+        //             return response()->json([
+        //                 'success' => false,
+        //                 'message' => $message,
+        //                 'errors' => ['login' => [$message]]
+        //             ], 423);
+        //         }
+        //         throw ValidationException::withMessages([
+        //             'login' => [$message],
+        //         ]);
+        //     }
+        // }
 
         return $this->sendFailedLoginResponse($request);
     }
@@ -185,10 +182,20 @@ class LoginController extends Controller
             return false;
         }
 
-        // Check if account is locked
-        if ($user->isAccountLocked()) {
-            return false;
-        }
+        // DISABLED - Check if account is locked
+        // if ($user->isAccountLocked()) {
+        //     return false;
+        // }
+
+        // DISABLED - Check if user status is approved
+        // if ($user->status !== 'approved') {
+        //     return false;
+        // }
+
+        // DISABLED - Check if user is active
+        // if (!$user->is_active) {
+        //     return false;
+        // }
 
         // Verify password
         if (!Hash::check($password, $user->password)) {
@@ -211,7 +218,22 @@ class LoginController extends Controller
      */
     protected function sendFailedLoginResponse(Request $request)
     {
+        // Simplified error message since we disabled status checks
         $message = 'Email/username/WhatsApp atau password salah.';
+        
+        // DISABLED - Status-specific error messages
+        // $identifier = $request->input('login');
+        // $user = User::whereIdentifier($identifier)->first();
+        // if ($user) {
+        //     if ($user->status !== 'approved') {
+        //         $message = 'Akun Anda belum disetujui oleh admin. Silakan hubungi administrator.';
+        //     } elseif (!$user->is_active) {
+        //         $message = 'Akun Anda tidak aktif. Silakan hubungi administrator.';
+        //     } elseif ($user->isAccountLocked()) {
+        //         $minutes = $user->getLockoutTimeRemaining();
+        //         $message = "Akun terkunci karena terlalu banyak percobaan gagal. Coba lagi dalam {$minutes} menit.";
+        //     }
+        // }
         
         if ($request->expectsJson()) {
             return response()->json([
@@ -295,24 +317,27 @@ class LoginController extends Controller
      */
     protected function checkTooManyFailedAttempts(Request $request)
     {
-        if (!RateLimiter::tooManyAttempts($this->throttleKey($request), 5)) {
-            return;
-        }
+        // DISABLED - No rate limiting
+        // if (!RateLimiter::tooManyAttempts($this->throttleKey($request), 5)) {
+        //     return;
+        // }
 
-        $seconds = RateLimiter::availableIn($this->throttleKey($request));
-        $minutes = ceil($seconds / 60);
+        // $seconds = RateLimiter::availableIn($this->throttleKey($request));
+        // $minutes = ceil($seconds / 60);
 
-        $message = "Terlalu banyak percobaan login. Silakan coba lagi dalam {$minutes} menit.";
+        // $message = "Terlalu banyak percobaan login. Silakan coba lagi dalam {$minutes} menit.";
 
-        if ($request->expectsJson()) {
-            throw ValidationException::withMessages([
-                'login' => [$message],
-            ])->status(429);
-        }
+        // if ($request->expectsJson()) {
+        //     throw ValidationException::withMessages([
+        //         'login' => [$message],
+        //     ])->status(429);
+        // }
 
-        throw ValidationException::withMessages([
-            'login' => [$message],
-        ]);
+        // throw ValidationException::withMessages([
+        //     'login' => [$message],
+        // ]);
+        
+        return; // Always allow login attempts
     }
 
     /**
@@ -323,7 +348,9 @@ class LoginController extends Controller
      */
     protected function incrementLoginAttempts(Request $request)
     {
-        RateLimiter::hit($this->throttleKey($request), 60 * 15); // 15 minutes decay
+        // DISABLED - No rate limiting tracking
+        // RateLimiter::hit($this->throttleKey($request), 60 * 15); // 15 minutes decay
+        return; // Do nothing
     }
 
     /**
@@ -334,6 +361,8 @@ class LoginController extends Controller
      */
     protected function clearLoginAttempts(Request $request)
     {
-        RateLimiter::clear($this->throttleKey($request));
+        // DISABLED - No rate limiting tracking
+        // RateLimiter::clear($this->throttleKey($request));
+        return; // Do nothing
     }
 }

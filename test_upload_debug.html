@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Profile Photo Upload</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+</head>
+<body>
+    <h2>Test Upload Foto Profil</h2>
+    
+    <form action="{{ route('alumni.profile.update') }}" method="POST" enctype="multipart/form-data">
+        @csrf
+        @method('PUT')
+        
+        <div>
+            <label>Pilih Foto:</label>
+            <input type="file" name="profile_photo" accept="image/*" required>
+        </div>
+        
+        <input type="hidden" name="save_photo" value="1">
+        <button type="submit">Upload Foto</button>
+    </form>
+    
+    @if(session('success'))
+        <div style="color: green; margin-top: 10px;">
+            {{ session('success') }}
+        </div>
+    @endif
+    
+    @if($errors->any())
+        <div style="color: red; margin-top: 10px;">
+            @foreach($errors->all() as $error)
+                <p>{{ $error }}</p>
+            @endforeach
+        </div>
+    @endif
+    
+    <hr>
+    <h3>Debug Info:</h3>
+    <p><strong>Storage Path:</strong> {{ storage_path('app/public/profile-photos') }}</p>
+    <p><strong>Public Path:</strong> {{ public_path('storage/profile-photos') }}</p>
+    <p><strong>Storage Writable:</strong> {{ is_writable(storage_path('app/public/profile-photos')) ? 'YES' : 'NO' }}</p>
+    <p><strong>Public Writable:</strong> {{ is_writable(public_path('storage/profile-photos')) ? 'YES' : 'NO' }}</p>
+</body>
+</html>

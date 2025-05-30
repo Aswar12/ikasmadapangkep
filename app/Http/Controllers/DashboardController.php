@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\Dashboard\AlumniDashboardController;
 
 class DashboardController extends Controller
 {
@@ -20,7 +21,8 @@ class DashboardController extends Controller
         // Check if user has role attribute
         if (!isset($user->role)) {
             // Default to alumni dashboard if role is not set
-            return view('dashboard.alumni');
+            $alumniDashboard = new AlumniDashboardController();
+            return $alumniDashboard->index();
         }
 
         // Redirect based on user role
@@ -31,7 +33,8 @@ class DashboardController extends Controller
             case 'department_coordinator':
                 return view('dashboard.coordinator');
             default:
-                return view('dashboard.alumni');
+                $alumniDashboard = new AlumniDashboardController();
+                return $alumniDashboard->index();
         }
     }
 }

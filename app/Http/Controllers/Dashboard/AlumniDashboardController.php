@@ -25,12 +25,12 @@ class AlumniDashboardController extends Controller
         // Payment status
         $currentYear = date('Y');
         $paymentStatus = Payment::where('user_id', $user->id)
-            ->where('year_period', $currentYear)
+            ->where('year', $currentYear)
             ->first();
         
         // Upcoming events
-        $upcomingEvents = Event::where('event_date', '>=', now())
-            ->orderBy('event_date', 'asc')
+        $upcomingEvents = Event::where('start_date', '>=', now())
+            ->orderBy('start_date', 'asc')
             ->take(5)
             ->get();
             
@@ -41,8 +41,8 @@ class AlumniDashboardController extends Controller
         $myEvents = Event::whereHas('registrations', function ($query) use ($user) {
             $query->where('user_id', $user->id);
         })
-        ->where('event_date', '>=', now())
-        ->orderBy('event_date', 'asc')
+        ->where('start_date', '>=', now())
+        ->orderBy('start_date', 'asc')
         ->get();
         
         // Latest program kerja
@@ -53,8 +53,8 @@ class AlumniDashboardController extends Controller
             ->get();
         
         // Latest job vacancies
-        $latestJobs = JobVacancy::where('is_active', true)
-            ->where('application_deadline', '>=', now())
+        $latestJobs = JobVacancy::where('status', 'published')
+            ->where('deadline', '>=', now())
             ->orderBy('created_at', 'desc')
             ->take(5)
             ->get();
@@ -63,19 +63,19 @@ class AlumniDashboardController extends Controller
         $recent_jobs = $latestJobs;
         
         // Latest albums from my year
-        $latestAlbums = Album::where('graduation_year', $user->graduation_year)
+        $latestAlbums = Album::where('angkatan', $user->angkatan)
             ->orderBy('created_at', 'desc')
             ->take(4)
             ->get();
         
         // Statistics
         $stats = [
-            'total_alumni_angkatan' => \App\Models\User::where('graduation_year', $user->graduation_year)
+            'total_alumni_angkatan' => \App\Models\User::where('angkatan', $user->angkatan)
                 ->where('role', 'alumni')
                 ->count(),
             'total_events_registered' => $user->eventRegistrations()->count(),
             'profile_completion' => $profileCompletion,
-            'payment_status' => $paymentStatus ? $paymentStatus->status : 'belum_bayar',
+            'payment_status' => $paymentStatus ? $paymentStatus->status : 'belum bayar',
         ];
         
         return view('alumni.dashboard', [

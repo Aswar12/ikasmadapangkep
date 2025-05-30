@@ -48,10 +48,16 @@
             
             <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                 <div class="flex items-center">
-                    <i class="fas fa-times-circle text-red-500 mr-3"></i>
+                    <i class="fas fa-check-circle text-green-600 mr-3"></i>
                     <span class="text-sm text-gray-700">Foto Profil</span>
                 </div>
-                <span class="text-xs text-red-600 font-semibold">Belum</span>
+                <span class="text-xs text-green-600 font-semibold">
+                    @if(!empty($profile) && !empty($profile->profile_photo))
+                        Lengkap
+                    @else
+                        Belum
+                    @endif
+                </span>
             </div>
             
             <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">

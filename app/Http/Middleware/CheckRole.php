@@ -12,11 +12,11 @@ class CheckRole
      * Handle an incoming request.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
-     * @param  string  $roles
-     * @return mixed
+     * @param  \Closure(\Illuminate\Http\Request): (\Illuminate\Http\Response|\Illuminate\Http\RedirectResponse)  $next
+     * @param  string  $role
+     * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
      */
-    public function handle(Request $request, Closure $next, ...$roles)
+    public function handle(Request $request, Closure $next, string $role)
     {
         if (!Auth::check()) {
             return redirect()->route('login');
@@ -24,16 +24,17 @@ class CheckRole
 
         $user = Auth::user();
 
-        // Check if user has any of the required roles
-        if (!in_array($user->role, $roles)) {
-            // Redirect to appropriate dashboard based on user's actual role
-            $defaultRoute = match ($user->role) {
-                'admin', 'sub_admin' => 'admin.dashboard',
-                'department_coordinator' => 'coordinator.dashboard',
-                'alumni' => 'alumni.dashboard',
-                default => '/'
-            };
-            return redirect()->route($defaultRoute);
+        // Check if user has the required role
+        if ($user->role !== $role) {
+            // Redirect based on user's actual role
+            switch ($user->role) {
+                case 'admin':
+                    return redirect()->route('admin.dashboard');
+                case 'alumni':
+                    return redirect()->route('alumni.dashboard');
+                default:
+                    return redirect()->route('home');
+            }
         }
 
         return $next($request);

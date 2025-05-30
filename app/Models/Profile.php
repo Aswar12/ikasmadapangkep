@@ -11,6 +11,7 @@ class Profile extends Model
 
     protected $fillable = [
         'user_id',
+        'profile_photo',  // Added profile_photo column
         'gender',
         'birth_place',
         'birth_date',
@@ -24,8 +25,7 @@ class Profile extends Model
         'entry_year',
         'graduation_year',
         'diploma_number',
-        'certificate_number',
-        'profile_photo'
+        'certificate_number'
     ];
 
     protected $casts = [
