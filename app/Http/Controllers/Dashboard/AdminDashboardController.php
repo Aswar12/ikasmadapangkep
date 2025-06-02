@@ -18,6 +18,8 @@ class AdminDashboardController extends Controller
         // Statistik umum
         $stats = [
             'total_alumni' => User::where('role', 'alumni')->count(),
+            'alumni_aktif' => User::where('role', 'alumni')->where('status', 'active')->count(),
+            'alumni_pending' => User::where('role', 'alumni')->where('status', 'pending')->count(),
             'total_departments' => Department::count(),
             'total_events' => Event::count(),
             'upcoming_events' => Event::where('event_date', '>=', now())->count(),
@@ -27,39 +29,45 @@ class AdminDashboardController extends Controller
 
         // Alumni berdasarkan tahun kelulusan
         $alumniByYear = DB::table('users')
-            ->join('profiles', 'users.id', '=', 'profiles.user_id')
-            ->join('year_references', 'profiles.graduation_year_id', '=', 'year_references.id')
             ->where('users.role', 'alumni')
-            ->select('year_references.year', DB::raw('count(*) as total'))
-            ->groupBy('year_references.year', 'year_references.id')
-            ->orderBy('year_references.year', 'desc')
+            ->whereNotNull('users.angkatan')
+            ->select('users.angkatan as graduation_year', DB::raw('count(*) as total'))
+            ->groupBy('users.angkatan')
+            ->orderBy('users.angkatan', 'desc')
             ->take(10)
             ->get();
 
         // Alumni berdasarkan pekerjaan
         $alumniByJob = DB::table('users')
-            ->join('profiles', 'users.id', '=', 'profiles.user_id')
-            ->join('profession_references', 'profiles.profession_id', '=', 'profession_references.id')
             ->where('users.role', 'alumni')
-            ->whereNotNull('profiles.profession_id')
-            ->select('profession_references.name as profession', DB::raw('count(*) as total'))
-            ->groupBy('profession_references.name', 'profession_references.id')
+            ->whereNotNull('users.current_job')
+            ->select('users.current_job', DB::raw('count(*) as total'))
+            ->groupBy('users.current_job')
             ->orderBy('total', 'desc')
+            ->take(10)
+            ->get();
+
+        // Pending approvals
+        $pendingApprovals = User::where('role', 'alumni')
+            ->where('status', 'pending')
+            ->orderBy('created_at', 'desc')
             ->take(10)
             ->get();
 
         // Recent registrations
         $recentRegistrations = User::where('role', 'alumni')
-            ->with('profile.yearReference', 'profile.professionReference')
             ->orderBy('created_at', 'desc')
             ->take(5)
             ->get();
 
-        // Login attempts (failed)
-        $recentFailedLogins = LoginAttempt::where('success', false)
-            ->orderBy('created_at', 'desc')
-            ->take(10)
-            ->get();
+        // Login attempts (failed) - check if table exists
+        $recentFailedLogins = collect();
+        if (DB::getSchemaBuilder()->hasTable('login_attempts')) {
+            $recentFailedLogins = LoginAttempt::where('success', false)
+                ->orderBy('created_at', 'desc')
+                ->take(10)
+                ->get();
+        }
 
         // Program kerja progress
         $programKerjaProgress = ProgramKerja::with('department')
@@ -71,15 +79,16 @@ class AdminDashboardController extends Controller
         // Department statistics
         $departmentStats = Department::withCount([
             'programKerja',
-            'programKerja as active_programs' => function ($query) {
+            'programKerja as active_programs_count' => function ($query) {
                 $query->where('status', 'in_progress');
             }
         ])->get();
 
-        return view('admin.dashboard.index', [
+        return view('dashboard.admin', [
             'stats' => $stats,
             'alumniByYear' => $alumniByYear,
             'alumniByJob' => $alumniByJob,
+            'pendingApprovals' => $pendingApprovals,
             'recentRegistrations' => $recentRegistrations,
             'recentFailedLogins' => $recentFailedLogins,
             'programKerjaProgress' => $programKerjaProgress,

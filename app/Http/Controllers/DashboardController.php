@@ -29,7 +29,7 @@ class DashboardController extends Controller
         switch ($user->role) {
             case 'admin':
             case 'sub_admin':
-                return view('dashboard.admin');
+                return redirect()->route('admin.dashboard');
             case 'department_coordinator':
                 return view('dashboard.coordinator');
             default:

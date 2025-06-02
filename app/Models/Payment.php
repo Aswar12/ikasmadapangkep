@@ -11,21 +11,24 @@ class Payment extends Model
 
     protected $fillable = [
         'user_id',
+        'payment_code',
+        'year',
         'amount',
-        'status',
-        'payment_date',
         'payment_method',
         'payment_proof',
-        'year_period',
-        'notes',
+        'status',
         'verified_by',
-        'verification_date'
+        'verified_at',
+        'paid_at',
+        'notes',
+        'rejection_reason'
     ];
 
     protected $casts = [
-        'payment_date' => 'datetime',
-        'verification_date' => 'datetime',
+        'paid_at' => 'datetime',
+        'verified_at' => 'datetime',
         'amount' => 'decimal:2',
+        'year' => 'integer'
     ];
 
     /**
@@ -50,12 +53,51 @@ class Payment extends Model
     public function getStatusLabelAttribute()
     {
         switch ($this->status) {
-            case 'sudah_lunas':
-                return '<span class="badge bg-success">Lunas</span>';
-            case 'menunggu_verifikasi':
+            case 'verified':
+                return '<span class="badge bg-success">Terverifikasi</span>';
+            case 'waiting_verification':
                 return '<span class="badge bg-warning">Menunggu Verifikasi</span>';
+            case 'rejected':
+                return '<span class="badge bg-danger">Ditolak</span>';
+            case 'pending':
             default:
-                return '<span class="badge bg-danger">Belum Bayar</span>';
+                return '<span class="badge bg-secondary">Belum Bayar</span>';
+        }
+    }
+
+    /**
+     * Get status badge class
+     */
+    public function getStatusBadgeClassAttribute()
+    {
+        switch ($this->status) {
+            case 'verified':
+                return 'bg-green-100 text-green-800';
+            case 'waiting_verification':
+                return 'bg-yellow-100 text-yellow-800';
+            case 'rejected':
+                return 'bg-red-100 text-red-800';
+            case 'pending':
+            default:
+                return 'bg-gray-100 text-gray-800';
+        }
+    }
+
+    /**
+     * Get status text
+     */
+    public function getStatusTextAttribute()
+    {
+        switch ($this->status) {
+            case 'verified':
+                return 'Terverifikasi';
+            case 'waiting_verification':
+                return 'Menunggu Verifikasi';
+            case 'rejected':
+                return 'Ditolak';
+            case 'pending':
+            default:
+                return 'Belum Bayar';
         }
     }
 
@@ -65,5 +107,82 @@ class Payment extends Model
     public function getFormattedAmountAttribute()
     {
         return 'Rp ' . number_format($this->amount, 0, ',', '.');
+    }
+
+    /**
+     * Generate unique payment code
+     */
+    public static function generatePaymentCode()
+    {
+        do {
+            $code = 'PAY-' . date('Ymd') . '-' . strtoupper(substr(uniqid(), -6));
+        } while (self::where('payment_code', $code)->exists());
+        
+        return $code;
+    }
+
+    /**
+     * Scope for pending payments
+     */
+    public function scopePending($query)
+    {
+        return $query->where('status', 'pending');
+    }
+
+    /**
+     * Scope for waiting verification
+     */
+    public function scopeWaitingVerification($query)
+    {
+        return $query->where('status', 'waiting_verification');
+    }
+
+    /**
+     * Scope for verified payments
+     */
+    public function scopeVerified($query)
+    {
+        return $query->where('status', 'verified');
+    }
+
+    /**
+     * Scope for rejected payments
+     */
+    public function scopeRejected($query)
+    {
+        return $query->where('status', 'rejected');
+    }
+
+    /**
+     * Check if payment can be verified
+     */
+    public function canBeVerified()
+    {
+        return $this->status === 'waiting_verification' && $this->payment_proof;
+    }
+
+    /**
+     * Check if payment is editable
+     */
+    public function isEditable()
+    {
+        return in_array($this->status, ['pending', 'rejected']);
+    }
+
+    /**
+     * Get payment proof URL
+     */
+    public function getPaymentProofUrlAttribute()
+    {
+        if (!$this->payment_proof) {
+            return null;
+        }
+
+        // Check if file exists in storage
+        if (\Storage::disk('public')->exists($this->payment_proof)) {
+            return asset('storage/' . $this->payment_proof);
+        }
+
+        return null;
     }
 }

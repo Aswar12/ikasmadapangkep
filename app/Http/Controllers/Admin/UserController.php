@@ -113,4 +113,22 @@ class UserController extends Controller
         return redirect()->route('admin.users.index')
             ->with('success', 'User berhasil dihapus.');
     }
+
+    /**
+     * Approve the specified user.
+     */
+    public function approve(User $user)
+    {
+        $user->update(['status' => 'approved']);
+        return redirect()->back()->with('success', 'User approved successfully.');
+    }
+
+    /**
+     * Reject the specified user.
+     */
+    public function reject(User $user)
+    {
+        $user->update(['status' => 'rejected']);
+        return redirect()->back()->with('success', 'User rejected successfully.');
+    }
 }

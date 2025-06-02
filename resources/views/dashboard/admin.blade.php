@@ -1,191 +1,324 @@
-@extends('layouts.main')
+@extends('layouts.dashboard')
+
+@section('page-title', 'Dashboard Admin')
+
+@section('navigation')
+<!-- Sidebar Navigation -->
+<ul class="space-y-2 tracking-wide">
+    <!-- Dashboard -->
+    <li>
+        <a href="{{ route('admin.dashboard') }}" class="flex items-center space-x-3 rounded-xl px-4 py-3 text-white bg-gradient-to-r from-blue-600 to-blue-400">
+            <i class="fas fa-home"></i>
+            <span>Dashboard</span>
+        </a>
+    </li>
+    
+    <!-- Manajemen Pengguna -->
+    <li>
+        <div class="relative">
+            <button onclick="toggleDropdown('userMenu')" class="flex items-center space-x-3 rounded-xl px-4 py-3 text-gray-600 hover:bg-gray-100 w-full">
+                <i class="fas fa-users"></i>
+                <span>Manajemen Pengguna</span>
+                <i class="fas fa-chevron-down ml-auto text-xs"></i>
+            </button>
+            <ul id="userMenu" class="hidden pl-8 mt-2 space-y-2">
+                <li><a href="{{ route('admin.users.index') }}" class="block rounded-lg px-4 py-2 text-sm text-gray-600 hover:bg-gray-100">Alumni</a></li>
+                <li><a href="{{ route('admin.users.coordinators') }}" class="block rounded-lg px-4 py-2 text-sm text-gray-600 hover:bg-gray-100">Koordinator</a></li>
+                <li><a href="{{ route('admin.users.departments') }}" class="block rounded-lg px-4 py-2 text-sm text-gray-600 hover:bg-gray-100">Departemen</a></li>
+            </ul>
+        </div>
+    </li>
+    
+    <!-- Departemen & Program Kerja -->
+    <li>
+        <div class="relative">
+            <button onclick="toggleDropdown('deptMenu')" class="flex items-center space-x-3 rounded-xl px-4 py-3 text-gray-600 hover:bg-gray-100 w-full">
+                <i class="fas fa-building"></i>
+                <span>Departemen</span>
+                <i class="fas fa-chevron-down ml-auto text-xs"></i>
+            </button>
+            <ul id="deptMenu" class="hidden pl-8 mt-2 space-y-2">
+                <li><a href="{{ route('admin.departments.index') }}" class="block rounded-lg px-4 py-2 text-sm text-gray-600 hover:bg-gray-100">Kelola Departemen</a></li>
+                <li><a href="{{ route('admin.program-kerja.index') }}" class="block rounded-lg px-4 py-2 text-sm text-gray-600 hover:bg-gray-100">Program Kerja</a></li>
+            </ul>
+        </div>
+    </li>
+    
+    <!-- Event & Lowongan -->
+    <li>
+        <div class="relative">
+            <button onclick="toggleDropdown('eventMenu')" class="flex items-center space-x-3 rounded-xl px-4 py-3 text-gray-600 hover:bg-gray-100 w-full">
+                <i class="fas fa-calendar-alt"></i>
+                <span>Event & Lowongan</span>
+                <i class="fas fa-chevron-down ml-auto text-xs"></i>
+            </button>
+            <ul id="eventMenu" class="hidden pl-8 mt-2 space-y-2">
+                <li><a href="{{ route('admin.events.index') }}" class="block rounded-lg px-4 py-2 text-sm text-gray-600 hover:bg-gray-100">Kelola Event</a></li>
+                <li><a href="{{ route('admin.jobs.index') }}" class="block rounded-lg px-4 py-2 text-sm text-gray-600 hover:bg-gray-100">Lowongan Kerja</a></li>
+            </ul>
+        </div>
+    </li>
+    
+    <!-- Keuangan -->
+    <li>
+        <div class="relative">
+            <button onclick="toggleDropdown('financeMenu')" class="flex items-center space-x-3 rounded-xl px-4 py-3 text-gray-600 hover:bg-gray-100 w-full">
+                <i class="fas fa-coins"></i>
+                <span>Keuangan</span>
+                <i class="fas fa-chevron-down ml-auto text-xs"></i>
+            </button>
+            <ul id="financeMenu" class="hidden pl-8 mt-2 space-y-2">
+                <li><a href="{{ route('admin.finance.dues') }}" class="block rounded-lg px-4 py-2 text-sm text-gray-600 hover:bg-gray-100">Iuran Alumni</a></li>
+                <li><a href="{{ route('admin.finance.cashflow') }}" class="block rounded-lg px-4 py-2 text-sm text-gray-600 hover:bg-gray-100">Arus Kas</a></li>
+                <li><a href="{{ route('admin.finance.reports') }}" class="block rounded-lg px-4 py-2 text-sm text-gray-600 hover:bg-gray-100">Laporan</a></li>
+            </ul>
+        </div>
+    </li>
+    
+    <!-- Gallery -->
+    <li>
+        <a href="{{ route('admin.gallery.index') }}" class="flex items-center space-x-3 rounded-xl px-4 py-3 text-gray-600 hover:bg-gray-100">
+            <i class="fas fa-images"></i>
+            <span>Gallery</span>
+        </a>
+    </li>
+    
+    <!-- Laporan & Analitik -->
+    <li>
+        <a href="{{ route('admin.reports.index') }}" class="flex items-center space-x-3 rounded-xl px-4 py-3 text-gray-600 hover:bg-gray-100">
+            <i class="fas fa-chart-bar"></i>
+            <span>Laporan & Analitik</span>
+        </a>
+    </li>
+    
+    <!-- Pengaturan -->
+    <li>
+        <a href="{{ route('admin.settings.index') }}" class="flex items-center space-x-3 rounded-xl px-4 py-3 text-gray-600 hover:bg-gray-100">
+            <i class="fas fa-cog"></i>
+            <span>Pengaturan</span>
+        </a>
+    </li>
+</ul>
+@endsection
 
 @section('content')
-<div class="py-12">
-    <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-        <!-- Header -->
-        <div class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-900">Dashboard Admin</h1>
-            <p class="text-gray-600 mt-2">Selamat datang, {{ Auth::user()->name }}!</p>
-        </div>
-
-        <!-- Statistics Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <div class="bg-white overflow-hidden shadow-sm rounded-lg">
-                <div class="p-6">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0 bg-blue-500 rounded-md p-3">
-                            <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
-                            </svg>
-                        </div>
-                        <div class="ml-5 w-0 flex-1">
-                            <dl>
-                                <dt class="text-sm font-medium text-gray-500 truncate">Total Alumni</dt>
-                                <dd class="text-lg font-medium text-gray-900">{{ $stats['total_alumni'] }}</dd>
-                            </dl>
-                        </div>
-                    </div>
-                </div>
+<!-- Statistics Cards -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+    <!-- Total Alumni -->
+    <div class="bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl p-6 text-white">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-blue-100 text-sm">Total Alumni</p>
+                <h3 class="text-3xl font-bold mt-1">{{ number_format($stats['total_alumni']) }}</h3>
             </div>
-
-            <div class="bg-white overflow-hidden shadow-sm rounded-lg">
-                <div class="p-6">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0 bg-green-500 rounded-md p-3">
-                            <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                            </svg>
-                        </div>
-                        <div class="ml-5 w-0 flex-1">
-                            <dl>
-                                <dt class="text-sm font-medium text-gray-500 truncate">Alumni Aktif</dt>
-                                <dd class="text-lg font-medium text-gray-900">{{ $stats['alumni_aktif'] }}</dd>
-                            </dl>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="bg-white overflow-hidden shadow-sm rounded-lg">
-                <div class="p-6">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0 bg-yellow-500 rounded-md p-3">
-                            <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                            </svg>
-                        </div>
-                        <div class="ml-5 w-0 flex-1">
-                            <dl>
-                                <dt class="text-sm font-medium text-gray-500 truncate">Pending Approval</dt>
-                                <dd class="text-lg font-medium text-gray-900">{{ $stats['alumni_pending'] }}</dd>
-                            </dl>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="bg-white overflow-hidden shadow-sm rounded-lg">
-                <div class="p-6">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0 bg-purple-500 rounded-md p-3">
-                            <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-                            </svg>
-                        </div>
-                        <div class="ml-5 w-0 flex-1">
-                            <dl>
-                                <dt class="text-sm font-medium text-gray-500 truncate">Program Kerja Aktif</dt>
-                                <dd class="text-lg font-medium text-gray-900">{{ $stats['program_kerja_aktif'] }}</dd>
-                            </dl>
-                        </div>
-                    </div>
-                </div>
+            <div class="bg-white/20 rounded-full p-3">
+                <i class="fas fa-users text-2xl"></i>
             </div>
         </div>
-
-        <!-- Pending Approvals -->
-        @if($pendingApprovals->count() > 0)
-        <div class="bg-white overflow-hidden shadow-sm rounded-lg mb-8">
-            <div class="p-6">
-                <h2 class="text-lg font-medium text-gray-900 mb-4">Pending Approvals</h2>
-                <div class="space-y-4">
-                    @foreach($pendingApprovals as $pending)
-                    <div class="flex items-center justify-between p-4 border rounded-lg">
-                        <div>
-                            <p class="font-medium text-gray-900">{{ $pending->name }}</p>
-                            <p class="text-sm text-gray-500">{{ $pending->email }} | Angkatan {{ $pending->graduation_year }}</p>
-                            <p class="text-xs text-gray-400">Registered {{ $pending->created_at->diffForHumans() }}</p>
-                        </div>
-                        <div class="flex space-x-2">
-                            <form action="{{ route('admin.approve-user', $pending->id) }}" method="POST" class="inline">
-                                @csrf
-                                <button type="submit" class="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700">
-                                    Approve
-                                </button>
-                            </form>
-                            <form action="{{ route('admin.reject-user', $pending->id) }}" method="POST" class="inline">
-                                @csrf
-                                <button type="submit" class="px-3 py-1 bg-red-600 text-white text-sm rounded hover:bg-red-700">
-                                    Reject
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                    @endforeach
-                </div>
+    </div>
+    
+    <!-- Alumni Aktif -->
+    <div class="bg-gradient-to-r from-green-500 to-green-600 rounded-xl p-6 text-white">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-green-100 text-sm">Alumni Aktif</p>
+                <h3 class="text-3xl font-bold mt-1">{{ number_format($stats['alumni_aktif']) }}</h3>
+            </div>
+            <div class="bg-white/20 rounded-full p-3">
+                <i class="fas fa-user-check text-2xl"></i>
             </div>
         </div>
-        @endif
-
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <!-- Alumni by Year Chart -->
-            <div class="bg-white overflow-hidden shadow-sm rounded-lg">
-                <div class="p-6">
-                    <h2 class="text-lg font-medium text-gray-900 mb-4">Alumni Berdasarkan Tahun Kelulusan</h2>
-                    <canvas id="alumniByYearChart"></canvas>
-                </div>
+    </div>
+    
+    <!-- Pending Approval -->
+    <div class="bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-xl p-6 text-white">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-yellow-100 text-sm">Pending Approval</p>
+                <h3 class="text-3xl font-bold mt-1">{{ number_format($stats['alumni_pending']) }}</h3>
             </div>
-
-            <!-- Alumni by Job -->
-            <div class="bg-white overflow-hidden shadow-sm rounded-lg">
-                <div class="p-6">
-                    <h2 class="text-lg font-medium text-gray-900 mb-4">Alumni Berdasarkan Pekerjaan</h2>
-                    <canvas id="alumniByJobChart"></canvas>
-                </div>
+            <div class="bg-white/20 rounded-full p-3">
+                <i class="fas fa-clock text-2xl"></i>
             </div>
         </div>
-
-        <!-- Department Statistics -->
-        <div class="mt-8 bg-white overflow-hidden shadow-sm rounded-lg">
-            <div class="p-6">
-                <h2 class="text-lg font-medium text-gray-900 mb-4">Statistik Departemen</h2>
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Departemen
-                                </th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Total Program
-                                </th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Program Aktif
-                                </th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Action
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">
-                            @foreach($departmentStats as $dept)
-                            <tr>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm font-medium text-gray-900">{{ $dept->name }}</div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm text-gray-900">{{ $dept->program_kerja_count }}</div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm text-gray-900">{{ $dept->active_programs_count }}</div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                    <a href="#" class="text-indigo-600 hover:text-indigo-900">View Details</a>
-                                </td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
+    </div>
+    
+    <!-- Program Kerja Aktif -->
+    <div class="bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl p-6 text-white">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-purple-100 text-sm">Program Kerja Aktif</p>
+                <h3 class="text-3xl font-bold mt-1">{{ number_format($stats['program_kerja_aktif']) }}</h3>
+            </div>
+            <div class="bg-white/20 rounded-full p-3">
+                <i class="fas fa-tasks text-2xl"></i>
             </div>
         </div>
     </div>
 </div>
 
+<!-- Pending Approvals -->
+@if($pendingApprovals->count() > 0)
+<div class="bg-white rounded-xl shadow-sm p-6 mb-6">
+    <div class="flex items-center justify-between mb-4">
+        <h2 class="text-lg font-semibold text-gray-800">Pending Approvals</h2>
+        <a href="{{ route('admin.users.pending') }}" class="text-blue-600 hover:text-blue-800 text-sm">Lihat Semua</a>
+    </div>
+    <div class="space-y-3">
+        @foreach($pendingApprovals->take(5) as $pending)
+        <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+            <div class="flex items-center space-x-4">
+                <div class="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center">
+                    <i class="fas fa-user text-gray-600"></i>
+                </div>
+                <div>
+                    <p class="font-medium text-gray-900">{{ $pending->name }}</p>
+                    <p class="text-sm text-gray-500">{{ $pending->email }} • Angkatan {{ $pending->angkatan }}</p>
+                </div>
+            </div>
+            <div class="flex space-x-2">
+                <form action="{{ route('admin.users.approve', $pending->id) }}" method="POST" class="inline">
+                    @csrf
+                    <button type="submit" class="px-3 py-1 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700">
+                        <i class="fas fa-check mr-1"></i> Approve
+                    </button>
+                </form>
+                <form action="{{ route('admin.users.reject', $pending->id) }}" method="POST" class="inline">
+                    @csrf
+                    <button type="submit" class="px-3 py-1 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700">
+                        <i class="fas fa-times mr-1"></i> Reject
+                    </button>
+                </form>
+            </div>
+        </div>
+        @endforeach
+    </div>
+</div>
+@endif
+
+<!-- Charts Section -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+    <!-- Alumni by Year Chart -->
+    <div class="bg-white rounded-xl shadow-sm p-6">
+        <h2 class="text-lg font-semibold text-gray-800 mb-4">Alumni Berdasarkan Tahun Kelulusan</h2>
+        <canvas id="alumniByYearChart" class="w-full"></canvas>
+    </div>
+    
+    <!-- Alumni by Job Chart -->
+    <div class="bg-white rounded-xl shadow-sm p-6">
+        <h2 class="text-lg font-semibold text-gray-800 mb-4">Alumni Berdasarkan Pekerjaan</h2>
+        <canvas id="alumniByJobChart" class="w-full"></canvas>
+    </div>
+</div>
+
+<!-- Department Statistics -->
+<div class="bg-white rounded-xl shadow-sm p-6 mb-6">
+    <h2 class="text-lg font-semibold text-gray-800 mb-4">Statistik Departemen</h2>
+    <div class="overflow-x-auto">
+        <table class="min-w-full">
+            <thead>
+                <tr class="border-b">
+                    <th class="text-left py-3 px-4 text-sm font-medium text-gray-700">Departemen</th>
+                    <th class="text-center py-3 px-4 text-sm font-medium text-gray-700">Total Program</th>
+                    <th class="text-center py-3 px-4 text-sm font-medium text-gray-700">Program Aktif</th>
+                    <th class="text-center py-3 px-4 text-sm font-medium text-gray-700">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($departmentStats as $dept)
+                <tr class="border-b hover:bg-gray-50">
+                    <td class="py-3 px-4">
+                        <p class="font-medium text-gray-900">{{ $dept->name }}</p>
+                    </td>
+                    <td class="text-center py-3 px-4">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                            {{ $dept->program_kerja_count }}
+                        </span>
+                    </td>
+                    <td class="text-center py-3 px-4">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                            {{ $dept->active_programs_count }}
+                        </span>
+                    </td>
+                    <td class="text-center py-3 px-4">
+                        <a href="{{ route('admin.departments.show', $dept->id) }}" class="text-blue-600 hover:text-blue-800">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                    </td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="bg-white rounded-xl shadow-sm p-6">
+    <h2 class="text-lg font-semibold text-gray-800 mb-4">Quick Actions</h2>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <a href="{{ route('admin.users.create') }}" class="flex flex-col items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
+            <i class="fas fa-user-plus text-2xl text-blue-600 mb-2"></i>
+            <span class="text-sm text-gray-700">Tambah Alumni</span>
+        </a>
+        <a href="{{ route('admin.events.create') }}" class="flex flex-col items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
+            <i class="fas fa-calendar-plus text-2xl text-green-600 mb-2"></i>
+            <span class="text-sm text-gray-700">Buat Event</span>
+        </a>
+        <a href="{{ route('admin.program-kerja.create') }}" class="flex flex-col items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
+            <i class="fas fa-clipboard-list text-2xl text-purple-600 mb-2"></i>
+            <span class="text-sm text-gray-700">Program Kerja</span>
+        </a>
+        <a href="{{ route('admin.reports.export') }}" class="flex flex-col items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
+            <i class="fas fa-download text-2xl text-yellow-600 mb-2"></i>
+            <span class="text-sm text-gray-700">Export Data</span>
+        </a>
+    </div>
+</div>
+
+<!-- Mobile Bottom Navigation -->
+<div class="fixed bottom-0 left-0 right-0 bg-white border-t md:hidden z-50">
+    <div class="grid grid-cols-5 gap-1">
+        <a href="{{ route('admin.dashboard') }}" class="flex flex-col items-center py-2 text-blue-600">
+            <i class="fas fa-home text-xl"></i>
+            <span class="text-xs mt-1">Dashboard</span>
+        </a>
+        <a href="{{ route('admin.users.index') }}" class="flex flex-col items-center py-2 text-gray-600">
+            <i class="fas fa-users text-xl"></i>
+            <span class="text-xs mt-1">Alumni</span>
+        </a>
+        <a href="{{ route('admin.program-kerja.index') }}" class="flex flex-col items-center py-2 text-gray-600">
+            <i class="fas fa-tasks text-xl"></i>
+            <span class="text-xs mt-1">Program</span>
+        </a>
+        <a href="{{ route('admin.finance.index') }}" class="flex flex-col items-center py-2 text-gray-600">
+            <i class="fas fa-coins text-xl"></i>
+            <span class="text-xs mt-1">Keuangan</span>
+        </a>
+        <a href="{{ route('admin.settings.index') }}" class="flex flex-col items-center py-2 text-gray-600">
+            <i class="fas fa-cog text-xl"></i>
+            <span class="text-xs mt-1">Settings</span>
+        </a>
+    </div>
+</div>
+@endsection
+
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+    // Toggle dropdown menu
+    function toggleDropdown(menuId) {
+        const menu = document.getElementById(menuId);
+        const allMenus = document.querySelectorAll('[id$="Menu"]');
+        
+        allMenus.forEach(m => {
+            if (m.id !== menuId) {
+                m.classList.add('hidden');
+            }
+        });
+        
+        menu.classList.toggle('hidden');
+    }
+
     // Alumni by Year Chart
     const alumniByYearCtx = document.getElementById('alumniByYearChart').getContext('2d');
     new Chart(alumniByYearCtx, {
@@ -197,14 +330,24 @@
                 data: {!! json_encode($alumniByYear->pluck('total')) !!},
                 backgroundColor: 'rgba(59, 130, 246, 0.8)',
                 borderColor: 'rgba(59, 130, 246, 1)',
-                borderWidth: 1
+                borderWidth: 1,
+                borderRadius: 8,
             }]
         },
         options: {
             responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
             scales: {
                 y: {
-                    beginAtZero: true
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    }
                 }
             }
         }
@@ -225,18 +368,32 @@
                     'rgba(59, 130, 246, 0.8)',
                     'rgba(139, 92, 246, 0.8)',
                     'rgba(236, 72, 153, 0.8)',
-                ]
+                    'rgba(34, 197, 94, 0.8)',
+                    'rgba(251, 191, 36, 0.8)',
+                ],
+                borderWidth: 0
             }]
         },
         options: {
             responsive: true,
+            maintainAspectRatio: false,
             plugins: {
                 legend: {
                     position: 'bottom',
+                    labels: {
+                        padding: 15,
+                        font: {
+                            size: 12
+                        }
+                    }
                 }
             }
         }
     });
+
+    // Add padding to bottom on mobile to account for bottom navigation
+    if (window.innerWidth < 768) {
+        document.querySelector('main').style.paddingBottom = '4rem';
+    }
 </script>
 @endpush
-@endsection

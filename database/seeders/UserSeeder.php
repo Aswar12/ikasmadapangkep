@@ -23,6 +23,8 @@ class UserSeeder extends Seeder
                 'whatsapp' => '081234567890',
                 'password' => Hash::make('password'),
                 'email_verified_at' => now(),
+                'role' => 'admin',
+                'status' => 'approved',
             ],
             [
                 'name' => 'John Doe',
