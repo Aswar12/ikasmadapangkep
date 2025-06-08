@@ -109,9 +109,20 @@ Route::group(['middleware' => ['auth', 'role:admin'], 'prefix' => 'admin'], func
     Route::get('/users/departments', [App\Http\Controllers\Admin\UserController::class, 'departments'])->name('admin.users.departments');
     Route::post('/users/{user}/approve', [App\Http\Controllers\Admin\UserController::class, 'approve'])->name('admin.users.approve');
     Route::post('/users/{user}/reject', [App\Http\Controllers\Admin\UserController::class, 'reject'])->name('admin.users.reject');
+    Route::post('/users/bulk-approve', [App\Http\Controllers\Admin\UserController::class, 'bulkApprove'])->name('admin.users.bulkApprove');
+    Route::post('/users/bulk-reject', [App\Http\Controllers\Admin\UserController::class, 'bulkReject'])->name('admin.users.bulkReject');
+    Route::post('/users/bulk-change-role', [App\Http\Controllers\Admin\UserController::class, 'bulkChangeRole'])->name('admin.users.bulkChangeRole');
+    Route::post('/users/bulk-send-email', [App\Http\Controllers\Admin\UserController::class, 'bulkSendEmail'])->name('admin.users.bulkSendEmail');
+    Route::post('/users/bulk-delete', [App\Http\Controllers\Admin\UserController::class, 'bulkDelete'])->name('admin.users.bulkDelete');
     Route::get('/users/{user}/edit', [App\Http\Controllers\Admin\UserController::class, 'edit'])->name('admin.users.edit');
     Route::put('/users/{user}', [App\Http\Controllers\Admin\UserController::class, 'update'])->name('admin.users.update');
     Route::delete('/users/{user}', [App\Http\Controllers\Admin\UserController::class, 'destroy'])->name('admin.users.destroy');
+    
+    // Department management routes
+    Route::post('/departments', [App\Http\Controllers\Admin\UserController::class, 'storeDepartment'])->name('admin.departments.store');
+    Route::put('/departments/{department}', [App\Http\Controllers\Admin\UserController::class, 'updateDepartment'])->name('admin.departments.update');
+    Route::put('/departments/{department}/assign-coordinator', [App\Http\Controllers\Admin\UserController::class, 'assignCoordinator'])->name('admin.departments.assign-coordinator');
+    Route::delete('/departments/{department}', [App\Http\Controllers\Admin\UserController::class, 'destroyDepartment'])->name('admin.departments.destroy');
     
     // Department Management
     Route::get('/departments', function() { return view('admin.placeholder', ['title' => 'Departemen']); })->name('admin.departments.index');

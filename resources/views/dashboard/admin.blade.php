@@ -4,27 +4,27 @@
 
 @section('navigation')
 <!-- Sidebar Navigation -->
-<ul class="space-y-2 tracking-wide">
+<ul class="space-y-3 tracking-wide">
     <!-- Dashboard -->
     <li>
-        <a href="{{ route('admin.dashboard') }}" class="flex items-center space-x-3 rounded-xl px-4 py-3 text-white bg-gradient-to-r from-blue-600 to-blue-400">
-            <i class="fas fa-home"></i>
-            <span>Dashboard</span>
+        <a href="{{ route('admin.dashboard') }}" class="flex items-center space-x-4 rounded-xl px-5 py-3 text-white bg-gradient-to-r from-blue-600 to-blue-400">
+            <i class="fas fa-home text-lg w-6"></i>
+            <span class="text-base font-semibold truncate max-w-[120px]">Dashboard</span>
         </a>
     </li>
     
     <!-- Manajemen Pengguna -->
     <li>
         <div class="relative">
-            <button onclick="toggleDropdown('userMenu')" class="flex items-center space-x-3 rounded-xl px-4 py-3 text-gray-600 hover:bg-gray-100 w-full">
-                <i class="fas fa-users"></i>
-                <span>Manajemen Pengguna</span>
+            <button onclick="toggleDropdown('userMenu')" class="flex items-center space-x-4 rounded-xl px-5 py-3 text-gray-700 hover:bg-gray-100 w-full">
+                <i class="fas fa-users text-lg w-6"></i>
+                <span class="text-base font-semibold truncate max-w-[120px]">Pengguna</span>
                 <i class="fas fa-chevron-down ml-auto text-xs"></i>
             </button>
-            <ul id="userMenu" class="hidden pl-8 mt-2 space-y-2">
-                <li><a href="{{ route('admin.users.index') }}" class="block rounded-lg px-4 py-2 text-sm text-gray-600 hover:bg-gray-100">Alumni</a></li>
-                <li><a href="{{ route('admin.users.coordinators') }}" class="block rounded-lg px-4 py-2 text-sm text-gray-600 hover:bg-gray-100">Koordinator</a></li>
-                <li><a href="{{ route('admin.users.departments') }}" class="block rounded-lg px-4 py-2 text-sm text-gray-600 hover:bg-gray-100">Departemen</a></li>
+            <ul id="userMenu" class="hidden pl-10 mt-2 space-y-3">
+                <li><a href="{{ route('admin.users.index') }}" class="block rounded-lg px-5 py-2 text-sm text-gray-700 hover:bg-gray-100">Alumni</a></li>
+                <li><a href="{{ route('admin.users.coordinators') }}" class="block rounded-lg px-5 py-2 text-sm text-gray-700 hover:bg-gray-100">Koordinator</a></li>
+                <li><a href="{{ route('admin.users.departments') }}" class="block rounded-lg px-5 py-2 text-sm text-gray-700">Departemen</a></li>
             </ul>
         </div>
     </li>
@@ -32,14 +32,14 @@
     <!-- Departemen & Program Kerja -->
     <li>
         <div class="relative">
-            <button onclick="toggleDropdown('deptMenu')" class="flex items-center space-x-3 rounded-xl px-4 py-3 text-gray-600 hover:bg-gray-100 w-full">
-                <i class="fas fa-building"></i>
-                <span>Departemen</span>
+            <button onclick="toggleDropdown('deptMenu')" class="flex items-center space-x-4 rounded-xl px-5 py-3 text-gray-700 hover:bg-gray-100 w-full">
+                <i class="fas fa-building text-lg w-6"></i>
+                <span class="text-base font-semibold truncate max-w-[120px]">Departemen</span>
                 <i class="fas fa-chevron-down ml-auto text-xs"></i>
             </button>
-            <ul id="deptMenu" class="hidden pl-8 mt-2 space-y-2">
-                <li><a href="{{ route('admin.departments.index') }}" class="block rounded-lg px-4 py-2 text-sm text-gray-600 hover:bg-gray-100">Kelola Departemen</a></li>
-                <li><a href="{{ route('admin.program-kerja.index') }}" class="block rounded-lg px-4 py-2 text-sm text-gray-600 hover:bg-gray-100">Program Kerja</a></li>
+            <ul id="deptMenu" class="hidden pl-10 mt-2 space-y-3">
+                <li><a href="{{ route('admin.departments.index') }}" class="block rounded-lg px-5 py-2 text-sm text-gray-700 hover:bg-gray-100">Kelola Departemen</a></li>
+                <li><a href="{{ route('admin.program-kerja.index') }}" class="block rounded-lg px-5 py-2 text-sm text-gray-700 hover:bg-gray-100">Program Kerja</a></li>
             </ul>
         </div>
     </li>
@@ -47,14 +47,14 @@
     <!-- Event & Lowongan -->
     <li>
         <div class="relative">
-            <button onclick="toggleDropdown('eventMenu')" class="flex items-center space-x-3 rounded-xl px-4 py-3 text-gray-600 hover:bg-gray-100 w-full">
-                <i class="fas fa-calendar-alt"></i>
-                <span>Event & Lowongan</span>
+            <button onclick="toggleDropdown('eventMenu')" class="flex items-center space-x-4 rounded-xl px-5 py-3 text-gray-700 hover:bg-gray-100 w-full">
+                <i class="fas fa-calendar-alt text-lg w-6"></i>
+                <span class="text-base font-semibold truncate max-w-[120px]">Event & Lowongan</span>
                 <i class="fas fa-chevron-down ml-auto text-xs"></i>
             </button>
-            <ul id="eventMenu" class="hidden pl-8 mt-2 space-y-2">
-                <li><a href="{{ route('admin.events.index') }}" class="block rounded-lg px-4 py-2 text-sm text-gray-600 hover:bg-gray-100">Kelola Event</a></li>
-                <li><a href="{{ route('admin.jobs.index') }}" class="block rounded-lg px-4 py-2 text-sm text-gray-600 hover:bg-gray-100">Lowongan Kerja</a></li>
+            <ul id="eventMenu" class="hidden pl-10 mt-2 space-y-3">
+                <li><a href="{{ route('admin.events.index') }}" class="block rounded-lg px-5 py-2 text-sm text-gray-700 hover:bg-gray-100">Kelola Event</a></li>
+                <li><a href="{{ route('admin.jobs.index') }}" class="block rounded-lg px-5 py-2 text-sm text-gray-700 hover:bg-gray-100">Lowongan Kerja</a></li>
             </ul>
         </div>
     </li>
@@ -62,40 +62,40 @@
     <!-- Keuangan -->
     <li>
         <div class="relative">
-            <button onclick="toggleDropdown('financeMenu')" class="flex items-center space-x-3 rounded-xl px-4 py-3 text-gray-600 hover:bg-gray-100 w-full">
-                <i class="fas fa-coins"></i>
-                <span>Keuangan</span>
+            <button onclick="toggleDropdown('financeMenu')" class="flex items-center space-x-4 rounded-xl px-5 py-3 text-gray-700 hover:bg-gray-100 w-full">
+                <i class="fas fa-coins text-lg w-6"></i>
+                <span class="text-base font-semibold truncate max-w-[120px]">Keuangan</span>
                 <i class="fas fa-chevron-down ml-auto text-xs"></i>
             </button>
-            <ul id="financeMenu" class="hidden pl-8 mt-2 space-y-2">
-                <li><a href="{{ route('admin.finance.dues') }}" class="block rounded-lg px-4 py-2 text-sm text-gray-600 hover:bg-gray-100">Iuran Alumni</a></li>
-                <li><a href="{{ route('admin.finance.cashflow') }}" class="block rounded-lg px-4 py-2 text-sm text-gray-600 hover:bg-gray-100">Arus Kas</a></li>
-                <li><a href="{{ route('admin.finance.reports') }}" class="block rounded-lg px-4 py-2 text-sm text-gray-600 hover:bg-gray-100">Laporan</a></li>
+            <ul id="financeMenu" class="hidden pl-10 mt-2 space-y-3">
+                <li><a href="{{ route('admin.finance.dues') }}" class="block rounded-lg px-5 py-2 text-sm text-gray-700 hover:bg-gray-100">Iuran Alumni</a></li>
+                <li><a href="{{ route('admin.finance.cashflow') }}" class="block rounded-lg px-5 py-2 text-sm text-gray-700 hover:bg-gray-100">Arus Kas</a></li>
+                <li><a href="{{ route('admin.finance.reports') }}" class="block rounded-lg px-5 py-2 text-sm text-gray-700 hover:bg-gray-100">Laporan</a></li>
             </ul>
         </div>
     </li>
     
     <!-- Gallery -->
     <li>
-        <a href="{{ route('admin.gallery.index') }}" class="flex items-center space-x-3 rounded-xl px-4 py-3 text-gray-600 hover:bg-gray-100">
-            <i class="fas fa-images"></i>
-            <span>Gallery</span>
+        <a href="{{ route('admin.gallery.index') }}" class="flex items-center space-x-4 rounded-xl px-5 py-3 text-gray-700 hover:bg-gray-100">
+            <i class="fas fa-images text-lg w-6"></i>
+            <span class="text-base font-semibold truncate max-w-[120px]">Gallery</span>
         </a>
     </li>
     
     <!-- Laporan & Analitik -->
     <li>
-        <a href="{{ route('admin.reports.index') }}" class="flex items-center space-x-3 rounded-xl px-4 py-3 text-gray-600 hover:bg-gray-100">
-            <i class="fas fa-chart-bar"></i>
-            <span>Laporan & Analitik</span>
+        <a href="{{ route('admin.reports.index') }}" class="flex items-center space-x-4 rounded-xl px-5 py-3 text-gray-700 hover:bg-gray-100">
+            <i class="fas fa-chart-bar text-lg w-6"></i>
+            <span class="text-base font-semibold truncate max-w-[120px]">Laporan & Analitik</span>
         </a>
     </li>
     
     <!-- Pengaturan -->
     <li>
-        <a href="{{ route('admin.settings.index') }}" class="flex items-center space-x-3 rounded-xl px-4 py-3 text-gray-600 hover:bg-gray-100">
-            <i class="fas fa-cog"></i>
-            <span>Pengaturan</span>
+        <a href="{{ route('admin.settings.index') }}" class="flex items-center space-x-4 rounded-xl px-5 py-3 text-gray-700 hover:bg-gray-100">
+            <i class="fas fa-cog text-lg w-6"></i>
+            <span class="text-base font-semibold truncate max-w-[120px]">Pengaturan</span>
         </a>
     </li>
 </ul>
@@ -103,55 +103,81 @@
 
 @section('content')
 <!-- Statistics Cards -->
-<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
     <!-- Total Alumni -->
-    <div class="bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl p-6 text-white">
+    <div class="bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl p-6 text-white shadow-md">
         <div class="flex items-center justify-between">
             <div>
-                <p class="text-blue-100 text-sm">Total Alumni</p>
+                <p class="text-blue-100 text-sm font-semibold">Total Alumni</p>
                 <h3 class="text-3xl font-bold mt-1">{{ number_format($stats['total_alumni']) }}</h3>
             </div>
-            <div class="bg-white/20 rounded-full p-3">
-                <i class="fas fa-users text-2xl"></i>
+            <div class="bg-white/20 rounded-full w-12 h-12 flex items-center justify-center p-2 transition duration-300 hover:bg-white/30">
+                <i class="fas fa-users text-xl"></i>
             </div>
         </div>
     </div>
     
     <!-- Alumni Aktif -->
-    <div class="bg-gradient-to-r from-green-500 to-green-600 rounded-xl p-6 text-white">
+    <div class="bg-gradient-to-r from-green-500 to-green-600 rounded-xl p-6 text-white shadow-md">
         <div class="flex items-center justify-between">
             <div>
-                <p class="text-green-100 text-sm">Alumni Aktif</p>
+                <p class="text-green-100 text-sm font-semibold">Alumni Aktif</p>
                 <h3 class="text-3xl font-bold mt-1">{{ number_format($stats['alumni_aktif']) }}</h3>
             </div>
-            <div class="bg-white/20 rounded-full p-3">
-                <i class="fas fa-user-check text-2xl"></i>
+            <div class="bg-white/20 rounded-full w-12 h-12 flex items-center justify-center p-2 transition duration-300 hover:bg-white/30">
+                <i class="fas fa-user-check text-xl"></i>
             </div>
         </div>
     </div>
     
     <!-- Pending Approval -->
-    <div class="bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-xl p-6 text-white">
+    <div class="bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-xl p-6 text-white shadow-md">
         <div class="flex items-center justify-between">
             <div>
-                <p class="text-yellow-100 text-sm">Pending Approval</p>
+                <p class="text-yellow-100 text-sm font-semibold">Pending Approval</p>
                 <h3 class="text-3xl font-bold mt-1">{{ number_format($stats['alumni_pending']) }}</h3>
             </div>
-            <div class="bg-white/20 rounded-full p-3">
-                <i class="fas fa-clock text-2xl"></i>
+            <div class="bg-white/20 rounded-full w-12 h-12 flex items-center justify-center p-2 transition duration-300 hover:bg-white/30">
+                <i class="fas fa-clock text-xl"></i>
             </div>
         </div>
     </div>
     
     <!-- Program Kerja Aktif -->
-    <div class="bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl p-6 text-white">
+    <div class="bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl p-6 text-white shadow-md">
         <div class="flex items-center justify-between">
             <div>
-                <p class="text-purple-100 text-sm">Program Kerja Aktif</p>
+                <p class="text-purple-100 text-sm font-semibold">Program Kerja Aktif</p>
                 <h3 class="text-3xl font-bold mt-1">{{ number_format($stats['program_kerja_aktif']) }}</h3>
             </div>
-            <div class="bg-white/20 rounded-full p-3">
-                <i class="fas fa-tasks text-2xl"></i>
+            <div class="bg-white/20 rounded-full w-12 h-12 flex items-center justify-center p-2 transition duration-300 hover:bg-white/30">
+                <i class="fas fa-tasks text-xl"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Total Departemen -->
+    <div class="bg-gradient-to-r from-indigo-500 to-indigo-600 rounded-xl p-6 text-white shadow-md">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-indigo-100 text-sm font-semibold">Total Departemen</p>
+                <h3 class="text-3xl font-bold mt-1">{{ number_format($stats['total_departments']) }}</h3>
+            </div>
+            <div class="bg-white/20 rounded-full w-12 h-12 flex items-center justify-center p-2 transition duration-300 hover:bg-white/30">
+                <i class="fas fa-building text-xl"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Total Event -->
+    <div class="bg-gradient-to-r from-red-500 to-red-600 rounded-xl p-6 text-white shadow-md">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-red-100 text-sm font-semibold">Total Event</p>
+                <h3 class="text-3xl font-bold mt-1">{{ number_format($stats['total_events']) }}</h3>
+            </div>
+            <div class="bg-white/20 rounded-full w-12 h-12 flex items-center justify-center p-2 transition duration-300 hover:bg-white/30">
+                <i class="fas fa-calendar-alt text-xl"></i>
             </div>
         </div>
     </div>
@@ -201,13 +227,13 @@
     <!-- Alumni by Year Chart -->
     <div class="bg-white rounded-xl shadow-sm p-6">
         <h2 class="text-lg font-semibold text-gray-800 mb-4">Alumni Berdasarkan Tahun Kelulusan</h2>
-        <canvas id="alumniByYearChart" class="w-full"></canvas>
+<canvas id="alumniByYearChart" class="w-full" style="height: 300px; max-height: 300px;"></canvas>
     </div>
     
     <!-- Alumni by Job Chart -->
     <div class="bg-white rounded-xl shadow-sm p-6">
         <h2 class="text-lg font-semibold text-gray-800 mb-4">Alumni Berdasarkan Pekerjaan</h2>
-        <canvas id="alumniByJobChart" class="w-full"></canvas>
+<canvas id="alumniByJobChart" class="w-full" style="height: 300px; max-height: 300px;"></canvas>
     </div>
 </div>
 

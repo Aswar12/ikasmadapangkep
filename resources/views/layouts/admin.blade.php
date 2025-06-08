@@ -32,29 +32,18 @@
                     <div class="p-4">
                         <ul class="space-y-1">
                             <li>
-                                <a href="{{ route('admin.dashboard') }}" class="flex items-center bg-blue-50 rounded-xl font-bold text-blue-900 py-3 px-4">
+                                <a href="{{ route('admin.dashboard') }}" class="flex items-center {{ request()->routeIs('admin.dashboard') ? 'bg-blue-50 text-blue-900 font-bold' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }} rounded-xl py-3 px-4">
                                     <i class="fas fa-home w-6"></i>
                                     <span>Dashboard</span>
                                 </a>
                             </li>
                             
                             <!-- User Management -->
-                            <li x-data="{ open: false }">
-                                <button @click="open = !open" class="flex items-center justify-between w-full text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-xl py-3 px-4">
-                                    <div class="flex items-center space-x-2">
-                                        <i class="fas fa-users w-6"></i>
-                                        <span>Manajemen Pengguna</span>
-                                    </div>
-                                    <span class="transform transition-transform" :class="{ 'rotate-180': open }">
-                                        <i class="fas fa-chevron-down"></i>
-                                    </span>
-                                </button>
-                                <ul x-show="open" class="pl-10 pr-2 py-2 space-y-1">
-                                    <li><a href="#" class="block text-gray-600 hover:text-gray-900 py-2">Alumni</a></li>
-                                    <li><a href="#" class="block text-gray-600 hover:text-gray-900 py-2">Koordinator Angkatan</a></li>
-                                    <li><a href="#" class="block text-gray-600 hover:text-gray-900 py-2">Koordinator Departemen</a></li>
-                                    <li><a href="#" class="block text-gray-600 hover:text-gray-900 py-2">Admin</a></li>
-                                </ul>
+                            <li>
+                                <a href="{{ route('admin.users.index') }}" class="flex items-center {{ request()->routeIs('admin.users.*') ? 'bg-blue-50 text-blue-900 font-bold' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }} rounded-xl py-3 px-4">
+                                    <i class="fas fa-users w-6"></i>
+                                    <span>Manajemen Pengguna</span>
+                                </a>
                             </li>
 
                             <!-- Departments -->
@@ -69,9 +58,8 @@
                                     </span>
                                 </button>
                                 <ul x-show="open" class="pl-10 pr-2 py-2 space-y-1">
-                                    <li><a href="#" class="block text-gray-600 hover:text-gray-900 py-2">Program Kerja</a></li>
-                                    <li><a href="#" class="block text-gray-600 hover:text-gray-900 py-2">Laporan Progress</a></li>
-                                    <li><a href="#" class="block text-gray-600 hover:text-gray-900 py-2">Dokumentasi</a></li>
+                                    <li><a href="{{ route('admin.departments.index') }}" class="block text-gray-600 hover:text-gray-900 py-2">Kelola Departemen</a></li>
+                                    <li><a href="{{ route('admin.program-kerja.index') }}" class="block text-gray-600 hover:text-gray-900 py-2">Program Kerja</a></li>
                                 </ul>
                             </li>
 
@@ -87,9 +75,8 @@
                                     </span>
                                 </button>
                                 <ul x-show="open" class="pl-10 pr-2 py-2 space-y-1">
-                                    <li><a href="#" class="block text-gray-600 hover:text-gray-900 py-2">Event</a></li>
-                                    <li><a href="#" class="block text-gray-600 hover:text-gray-900 py-2">Lowongan Kerja</a></li>
-                                    <li><a href="#" class="block text-gray-600 hover:text-gray-900 py-2">Pendaftaran Event</a></li>
+                                    <li><a href="{{ route('admin.events.index') }}" class="block text-gray-600 hover:text-gray-900 py-2">Kelola Event</a></li>
+                                    <li><a href="{{ route('admin.jobs.index') }}" class="block text-gray-600 hover:text-gray-900 py-2">Lowongan Kerja</a></li>
                                 </ul>
                             </li>
 
@@ -105,16 +92,16 @@
                                     </span>
                                 </button>
                                 <ul x-show="open" class="pl-10 pr-2 py-2 space-y-1">
-                                    <li><a href="#" class="block text-gray-600 hover:text-gray-900 py-2">Iuran</a></li>
-                                    <li><a href="#" class="block text-gray-600 hover:text-gray-900 py-2">Pemasukan</a></li>
-                                    <li><a href="#" class="block text-gray-600 hover:text-gray-900 py-2">Pengeluaran</a></li>
-                                    <li><a href="#" class="block text-gray-600 hover:text-gray-900 py-2">Laporan</a></li>
+                                    <li><a href="{{ route('admin.finance.dues') }}" class="block text-gray-600 hover:text-gray-900 py-2">Iuran Alumni</a></li>
+                                    <li><a href="{{ route('admin.finance.cashflow') }}" class="block text-gray-600 hover:text-gray-900 py-2">Arus Kas</a></li>
+                                    <li><a href="{{ route('admin.finance.reports') }}" class="block text-gray-600 hover:text-gray-900 py-2">Laporan</a></li>
+                                    <li><a href="{{ route('admin.payments') }}" class="block text-gray-600 hover:text-gray-900 py-2">Pembayaran</a></li>
                                 </ul>
                             </li>
 
                             <!-- Gallery -->
                             <li>
-                                <a href="#" class="flex items-center text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-xl py-3 px-4">
+                                <a href="{{ route('admin.gallery.index') }}" class="flex items-center text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-xl py-3 px-4">
                                     <i class="fas fa-images w-6"></i>
                                     <span>Galeri</span>
                                 </a>
@@ -122,15 +109,15 @@
 
                             <!-- Feedback -->
                             <li>
-                                <a href="#" class="flex items-center text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-xl py-3 px-4">
+                                <a href="{{ route('admin.reports.index') }}" class="flex items-center text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-xl py-3 px-4">
                                     <i class="fas fa-comment-dots w-6"></i>
-                                    <span>Feedback & Testimoni</span>
+                                    <span>Laporan & Analitik</span>
                                 </a>
                             </li>
 
                             <!-- Settings -->
                             <li>
-                                <a href="#" class="flex items-center text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-xl py-3 px-4">
+                                <a href="{{ route('admin.settings.index') }}" class="flex items-center text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-xl py-3 px-4">
                                     <i class="fas fa-cog w-6"></i>
                                     <span>Pengaturan</span>
                                 </a>

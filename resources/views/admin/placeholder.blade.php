@@ -13,20 +13,12 @@
         </a>
     </li>
     
-    <!-- Manajemen Pengguna -->
+    <!-- Manajemen Pengguna (direct link, no dropdown) -->
     <li>
-        <div class="relative">
-            <button onclick="toggleDropdown('userMenu')" class="flex items-center space-x-3 rounded-xl px-4 py-3 text-gray-600 hover:bg-gray-100 w-full">
-                <i class="fas fa-users"></i>
-                <span>Manajemen Pengguna</span>
-                <i class="fas fa-chevron-down ml-auto text-xs"></i>
-            </button>
-            <ul id="userMenu" class="hidden pl-8 mt-2 space-y-2">
-                <li><a href="{{ route('admin.users.index') }}" class="block rounded-lg px-4 py-2 text-sm text-gray-600 hover:bg-gray-100">Alumni</a></li>
-                <li><a href="{{ route('admin.users.coordinators') }}" class="block rounded-lg px-4 py-2 text-sm text-gray-600 hover:bg-gray-100">Koordinator</a></li>
-                <li><a href="{{ route('admin.users.departments') }}" class="block rounded-lg px-4 py-2 text-sm text-gray-600 hover:bg-gray-100">Departemen</a></li>
-            </ul>
-        </div>
+        <a href="{{ route('admin.users.index') }}" class="flex items-center space-x-3 rounded-xl px-4 py-3 text-gray-600 hover:bg-gray-100">
+            <i class="fas fa-users"></i>
+            <span>Manajemen Pengguna</span>
+        </a>
     </li>
     
     <!-- Departemen & Program Kerja -->

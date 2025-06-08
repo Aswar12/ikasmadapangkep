@@ -22,7 +22,7 @@ class AdminDashboardController extends Controller
             'alumni_pending' => User::where('role', 'alumni')->where('status', 'pending')->count(),
             'total_departments' => Department::count(),
             'total_events' => Event::count(),
-            'upcoming_events' => Event::where('event_date', '>=', now())->count(),
+            'upcoming_events' => Event::where('start_date', '>=', now())->count(),
             'total_program_kerja' => ProgramKerja::count(),
             'program_kerja_aktif' => ProgramKerja::where('status', 'in_progress')->count(),
         ];
@@ -39,10 +39,11 @@ class AdminDashboardController extends Controller
 
         // Alumni berdasarkan pekerjaan
         $alumniByJob = DB::table('users')
+            ->join('profiles', 'users.id', '=', 'profiles.user_id')
             ->where('users.role', 'alumni')
-            ->whereNotNull('users.current_job')
-            ->select('users.current_job', DB::raw('count(*) as total'))
-            ->groupBy('users.current_job')
+            ->whereNotNull('profiles.current_job')
+            ->select('profiles.current_job', DB::raw('count(*) as total'))
+            ->groupBy('profiles.current_job')
             ->orderBy('total', 'desc')
             ->take(10)
             ->get();
@@ -72,7 +73,7 @@ class AdminDashboardController extends Controller
         // Program kerja progress
         $programKerjaProgress = ProgramKerja::with('department')
             ->where('status', 'in_progress')
-            ->orderBy('progress_percentage', 'desc')
+            ->orderBy('updated_at', 'desc')
             ->take(5)
             ->get();
 

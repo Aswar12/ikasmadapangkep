@@ -23,16 +23,16 @@
 <body class="font-sans antialiased">
     <div class="min-h-screen bg-gray-100">
         <!-- Sidebar -->
-        <aside class="fixed inset-y-0 left-0 bg-white shadow-lg max-h-screen w-64 hidden md:block z-20">
+        <aside class="fixed inset-y-0 left-0 bg-white shadow-lg max-h-screen w-64 hidden md:flex flex-col z-20">
             <div class="flex flex-col justify-between h-full">
                 <div class="flex-grow">
                     <div class="px-4 py-6 text-center border-b">
                         <img src="{{ asset('images/LOGO IKA SMAD PANGKEP.png') }}" alt="Logo" class="h-16 mx-auto mb-2">
-                        <h1 class="text-xl font-bold leading-none"><span class="text-blue-700">Dashboard</span></h1>
+                        <h1 class="text-xl font-semibold text-gray-800">IKA SMADA Pangkep</h1>
                     </div>
                     <div class="p-4">
-                        <!-- Navigation items will be defined in extending layouts -->
-                        @yield('navigation')
+                    <!-- Navigation items will be defined in extending layouts -->
+                    @yield('navigation')
                     </div>
                 </div>
                 <div class="p-4 border-t">
@@ -40,7 +40,7 @@
                         @csrf
                         <button type="submit" class="flex items-center text-gray-600 hover:text-gray-900 w-full rounded-xl py-2 px-4">
                             <i class="fas fa-sign-out-alt w-6"></i>
-                            <span>Keluar</span>
+                            <span class="ml-2">Keluar</span>
                         </button>
                     </form>
                 </div>

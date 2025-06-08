@@ -69,13 +69,24 @@ class AlumniDashboardController extends Controller
             ->get();
         
         // Statistics
+        $statusTranslations = [
+            'waiting_verification' => 'Menunggu Verifikasi',
+            'verified' => 'Terverifikasi',
+            'rejected' => 'Ditolak',
+            'pending' => 'Belum Bayar',
+            'belum bayar' => 'Belum Bayar',
+        ];
+
+        $rawStatus = $paymentStatus ? $paymentStatus->status : 'belum bayar';
+        $translatedStatus = $statusTranslations[$rawStatus] ?? $rawStatus;
+
         $stats = [
-            'total_alumni_angkatan' => \App\Models\User::where('angkatan', $user->angkatan)
+            'total_alumni' => \App\Models\User::where('angkatan', $user->angkatan)
                 ->where('role', 'alumni')
                 ->count(),
             'total_events_registered' => $user->eventRegistrations()->count(),
             'profile_completion' => $profileCompletion,
-            'payment_status' => $paymentStatus ? $paymentStatus->status : 'belum bayar',
+            'payment_status' => $translatedStatus,
         ];
         
         return view('alumni.dashboard', [

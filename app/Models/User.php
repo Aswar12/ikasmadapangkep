@@ -24,6 +24,9 @@ class User extends Authenticatable
         'username',
         'whatsapp',
         'password',
+        'role',
+        'status',
+        'angkatan',
         'last_login_at',
         'login_count',
         'failed_login_attempts',
@@ -261,6 +264,38 @@ class User extends Authenticatable
     public function eventRegistrations()
     {
         return $this->hasMany(EventRegistration::class);
+    }
+    
+    /**
+     * Get the user's profile.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function profile()
+    {
+        return $this->hasOne(Profile::class);
+    }
+    
+    /**
+     * Get the departments that this user coordinates.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function coordinatedDepartments()
+    {
+        return $this->hasMany(Department::class, 'coordinator_id');
+    }
+    
+    /**
+     * Get the departments that this user belongs to.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function departments()
+    {
+        return $this->belongsToMany(Department::class, 'user_departments')
+                    ->withPivot('role_in_department')
+                    ->withTimestamps();
     }
     
     /**
