@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\ProgramKerjaUpdate; // Added this line
 
 class ProgramKerja extends Model
 {
@@ -54,7 +55,7 @@ class ProgramKerja extends Model
      */
     public function updates()
     {
-        return $this->hasMany(ProgramKerjaUpdate::class);
+        return $this->hasMany(ProgramKerjaUpdate::class)->orderBy('update_date', 'desc');
     }
 
     /**
