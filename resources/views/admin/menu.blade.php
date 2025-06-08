@@ -25,33 +25,38 @@
         </a>
     </li>
     
-    <!-- Event & Lowongan -->
+    <!-- Event & Lowongan - Refactored -->
     <li>
-        <div class="relative">
-            <a href="{{ route('admin.events.index') }}" class="flex items-center space-x-3 rounded-xl px-4 py-3 text-gray-600 hover:bg-gray-100 w-full">
-                <i class="fas fa-calendar-alt"></i>
-                <span>Event & Lowongan</span>
-            </a>
-            <ul id="eventMenu" class="pl-8 mt-2 space-y-2">
-                <li><a href="{{ route('admin.events.index') }}" class="block rounded-lg px-4 py-2 text-sm text-gray-600 hover:bg-gray-100">Kelola Event</a></li>
-                <li><a href="{{ route('admin.jobs.index') }}" class="block rounded-lg px-4 py-2 text-sm text-gray-600 hover:bg-gray-100">Lowongan Kerja</a></li>
-            </ul>
-        </div>
+        <a href="{{ route('admin.events.index') }}" class="flex items-center space-x-3 rounded-xl px-4 py-3 text-gray-600 hover:bg-gray-100">
+            <i class="fas fa-calendar-alt"></i> {{-- Or fas fa-calendar-check --}}
+            <span>Kelola Event</span>
+        </a>
+    </li>
+    <li>
+        <a href="{{ route('admin.jobs.index') }}" class="flex items-center space-x-3 rounded-xl px-4 py-3 text-gray-600 hover:bg-gray-100">
+            <i class="fas fa-briefcase"></i>
+            <span>Lowongan Kerja</span>
+        </a>
     </li>
     
-    <!-- Keuangan -->
+    <!-- Keuangan - Refactored -->
     <li>
-        <div class="relative">
-            <a href="{{ route('admin.finance.dues') }}" class="flex items-center space-x-3 rounded-xl px-4 py-3 text-gray-600 hover:bg-gray-100 w-full">
-                <i class="fas fa-coins"></i>
-                <span>Keuangan</span>
-            </a>
-            <ul id="financeMenu" class="pl-8 mt-2 space-y-2">
-                <li><a href="{{ route('admin.finance.dues') }}" class="block rounded-lg px-4 py-2 text-sm text-gray-600 hover:bg-gray-100">Iuran Alumni</a></li>
-                <li><a href="{{ route('admin.finance.cashflow') }}" class="block rounded-lg px-4 py-2 text-sm text-gray-600 hover:bg-gray-100">Arus Kas</a></li>
-                <li><a href="{{ route('admin.finance.reports') }}" class="block rounded-lg px-4 py-2 text-sm text-gray-600 hover:bg-gray-100">Laporan</a></li>
-            </ul>
-        </div>
+        <a href="{{ route('admin.finance.dues') }}" class="flex items-center space-x-3 rounded-xl px-4 py-3 text-gray-600 hover:bg-gray-100">
+            <i class="fas fa-money-check-alt"></i>
+            <span>Iuran Alumni</span>
+        </a>
+    </li>
+    <li>
+        <a href="{{ route('admin.finance.cashflow') }}" class="flex items-center space-x-3 rounded-xl px-4 py-3 text-gray-600 hover:bg-gray-100">
+            <i class="fas fa-cash-register"></i>
+            <span>Arus Kas</span>
+        </a>
+    </li>
+    <li>
+        <a href="{{ route('admin.finance.reports') }}" class="flex items-center space-x-3 rounded-xl px-4 py-3 text-gray-600 hover:bg-gray-100">
+            <i class="fas fa-file-invoice-dollar"></i>
+            <span>Laporan Keuangan</span>
+        </a>
     </li>
     
     <!-- Gallery -->
