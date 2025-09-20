@@ -1,4 +1,10 @@
-@extends('layouts.admin')
+@extends('layouts.dashboard')
+
+@section('page-title', 'Daftar Departemen')
+
+@section('navigation')
+    @include('admin.menu')
+@endsection
 
 @section('content')
 <div class="container-fluid">

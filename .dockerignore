@@ -6,3 +6,4 @@ yarn-error.log
 .git
 .gitignore
 docker-compose.override.yml
+public/storage

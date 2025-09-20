@@ -1,6 +1,10 @@
-@extends('layouts.admin')
+@extends('layouts.dashboard')
 
 @section('page-title', 'Manajemen Pengguna')
+
+@section('navigation')
+    @include('admin.menu')
+@endsection
 
 @section('content')
 <div class="container mx-auto">

@@ -19,26 +19,61 @@
 
     <!-- Styles -->
     @livewireStyles
+    
+    <!-- Fix untuk memastikan menu dapat diklik -->
+    <style>
+        /* Reset untuk sidebar */
+        aside {
+            z-index: 40 !important;
+        }
+        
+        /* Pastikan link dapat diklik */
+        aside a {
+            cursor: pointer !important;
+            pointer-events: auto !important;
+            position: relative !important;
+            z-index: 50 !important;
+        }
+        
+        /* Hapus overlay yang tidak perlu */
+        aside::before,
+        aside::after {
+            display: none !important;
+        }
+        
+        /* Mobile overlay dengan z-index lebih rendah */
+        #sidebarOverlay {
+            z-index: 30 !important;
+        }
+        
+        /* Main content z-index */
+        .md\:ml-64 {
+            position: relative;
+            z-index: 10;
+        }
+    </style>
+    
+    @stack('styles')
 </head>
 <body class="font-sans antialiased">
     <div class="min-h-screen bg-gray-100">
         <!-- Sidebar -->
-        <aside class="fixed inset-y-0 left-0 bg-white shadow-lg max-h-screen w-64 hidden md:flex flex-col z-20">
+        <aside class="fixed inset-y-0 left-0 bg-white shadow-lg max-h-screen w-64 hidden md:flex flex-col" style="z-index: 40;">
             <div class="flex flex-col justify-between h-full">
                 <div class="flex-grow">
                     <div class="px-4 py-6 text-center border-b">
                         <img src="{{ asset('images/LOGO IKA SMAD PANGKEP.png') }}" alt="Logo" class="h-16 mx-auto mb-2">
                         <h1 class="text-xl font-semibold text-gray-800">IKA SMADA Pangkep</h1>
                     </div>
-                    <div class="p-4">
-                    <!-- Navigation items will be defined in extending layouts -->
-                    @yield('navigation')
+                    <div class="p-4 overflow-y-auto">
+                        <!-- Navigation items will be defined in extending layouts -->
+                        @yield('navigation')
                     </div>
                 </div>
                 <div class="p-4 border-t">
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
-                        <button type="submit" class="flex items-center text-gray-600 hover:text-gray-900 w-full rounded-xl py-2 px-4">
+                        <button type="submit" class="flex items-center text-gray-600 hover:text-gray-900 hover:bg-gray-100 w-full rounded-xl py-2 px-4 transition-all duration-200">
                             <i class="fas fa-sign-out-alt w-6"></i>
                             <span class="ml-2">Keluar</span>
                         </button>
@@ -47,17 +82,42 @@
             </div>
         </aside>
 
-        <!-- Mobile Sidebar Toggle -->
-        <div class="fixed inset-0 bg-gray-900 opacity-50 z-10 hidden" id="sidebarOverlay"></div>
+        <!-- Mobile Sidebar (untuk mobile) -->
+        <aside id="mobileSidebar" class="fixed inset-y-0 left-0 bg-white shadow-lg max-h-screen w-64 flex flex-col transform -translate-x-full transition-transform duration-300 md:hidden" style="z-index: 40;">
+            <div class="flex flex-col justify-between h-full">
+                <div class="flex-grow">
+                    <div class="px-4 py-6 text-center border-b">
+                        <img src="{{ asset('images/LOGO IKA SMAD PANGKEP.png') }}" alt="Logo" class="h-16 mx-auto mb-2">
+                        <h1 class="text-xl font-semibold text-gray-800">IKA SMADA Pangkep</h1>
+                    </div>
+                    <div class="p-4 overflow-y-auto">
+                        @yield('navigation')
+                    </div>
+                </div>
+                <div class="p-4 border-t">
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit" class="flex items-center text-gray-600 hover:text-gray-900 hover:bg-gray-100 w-full rounded-xl py-2 px-4 transition-all duration-200">
+                            <i class="fas fa-sign-out-alt w-6"></i>
+                            <span class="ml-2">Keluar</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Mobile Sidebar Overlay -->
+        <div id="sidebarOverlay" class="fixed inset-0 bg-gray-900 opacity-50 hidden transition-opacity duration-300" style="z-index: 30;"></div>
         
-        <div class="fixed bottom-4 right-4 md:hidden z-30">
-            <button onclick="toggleSidebar()" class="bg-blue-600 text-white rounded-full p-3 shadow-lg">
+        <!-- Mobile Menu Toggle Button -->
+        <div class="fixed bottom-4 right-4 md:hidden" style="z-index: 50;">
+            <button onclick="toggleSidebar()" class="bg-blue-600 text-white rounded-full p-3 shadow-lg hover:bg-blue-700 transition-colors duration-200">
                 <i class="fas fa-bars"></i>
             </button>
         </div>
 
         <!-- Main Content -->
-        <div class="md:ml-64 p-8">
+        <div class="md:ml-64 p-4 md:p-8" style="position: relative; z-index: 10;">
             <!-- Top Navigation -->
             <nav class="bg-white shadow-sm rounded-xl p-4 mb-6">
                 <div class="flex justify-between items-center">
@@ -89,24 +149,46 @@
 
     <script>
     function toggleSidebar() {
-        const sidebar = document.querySelector('aside');
+        const mobileSidebar = document.getElementById('mobileSidebar');
         const overlay = document.getElementById('sidebarOverlay');
         
-        if (sidebar.classList.contains('hidden')) {
+        if (mobileSidebar.classList.contains('-translate-x-full')) {
             // Show sidebar
-            sidebar.classList.remove('hidden');
+            mobileSidebar.classList.remove('-translate-x-full');
             overlay.classList.remove('hidden');
-            sidebar.classList.add('flex');
         } else {
             // Hide sidebar
-            sidebar.classList.add('hidden');
+            mobileSidebar.classList.add('-translate-x-full');
             overlay.classList.add('hidden');
-            sidebar.classList.remove('flex');
         }
     }
 
     // Close sidebar when clicking overlay
     document.getElementById('sidebarOverlay').addEventListener('click', toggleSidebar);
+    
+    // Debug function untuk check clickability
+    function debugMenuClicks() {
+        const links = document.querySelectorAll('aside a');
+        console.log('Total menu links found:', links.length);
+        
+        links.forEach((link, index) => {
+            console.log(`Link ${index}:`, {
+                href: link.href,
+                clickable: window.getComputedStyle(link).pointerEvents !== 'none',
+                zIndex: window.getComputedStyle(link).zIndex
+            });
+            
+            // Test click
+            link.addEventListener('click', function(e) {
+                console.log('Menu clicked:', this.href);
+            });
+        });
+    }
+    
+    // Run debug on page load
+    window.addEventListener('load', debugMenuClicks);
     </script>
+    
+    @stack('scripts')
 </body>
 </html>

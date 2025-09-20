@@ -11,7 +11,7 @@
             <div class="col-lg-6" data-aos="fade-left">
                 <div class="about-content">
                     <h3 class="about-title">Sejarah & Visi Misi</h3>
-                    <p>IKASMADA Pangkep adalah organisasi yang mewadahi seluruh alumni SMA Negeri 1 Pangkajene dan Kepulauan untuk berinteraksi, berkolaborasi, dan berkontribusi bagi kemajuan almamater dan masyarakat.</p>
+                    <p>IKASMADA Pangkep adalah organisasi yang mewadahi seluruh alumni SMA Negeri 2 Pangkajene dan Kepulauan untuk berinteraksi, berkolaborasi, dan berkontribusi bagi kemajuan almamater dan masyarakat.</p>
                     <p>Didirikan pada tahun 1985, IKASMADA telah berhasil menghubungkan ribuan alumni dari berbagai generasi dan profesi di seluruh Indonesia bahkan dunia.</p>
                     <div class="row mt-4">
                         <div class="col-md-12 mb-3">

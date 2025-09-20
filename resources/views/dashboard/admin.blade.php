@@ -3,102 +3,7 @@
 @section('page-title', 'Dashboard Admin')
 
 @section('navigation')
-<!-- Sidebar Navigation -->
-<ul class="space-y-3 tracking-wide">
-    <!-- Dashboard -->
-    <li>
-        <a href="{{ route('admin.dashboard') }}" class="flex items-center space-x-4 rounded-xl px-5 py-3 text-white bg-gradient-to-r from-blue-600 to-blue-400">
-            <i class="fas fa-home text-lg w-6"></i>
-            <span class="text-base font-semibold truncate max-w-[120px]">Dashboard</span>
-        </a>
-    </li>
-    
-    <!-- Manajemen Pengguna -->
-    <li>
-        <div class="relative">
-            <button onclick="toggleDropdown('userMenu')" class="flex items-center space-x-4 rounded-xl px-5 py-3 text-gray-700 hover:bg-gray-100 w-full">
-                <i class="fas fa-users text-lg w-6"></i>
-                <span class="text-base font-semibold truncate max-w-[120px]">Pengguna</span>
-                <i class="fas fa-chevron-down ml-auto text-xs"></i>
-            </button>
-            <ul id="userMenu" class="hidden pl-10 mt-2 space-y-3">
-                <li><a href="{{ route('admin.users.index') }}" class="block rounded-lg px-5 py-2 text-sm text-gray-700 hover:bg-gray-100">Alumni</a></li>
-                <li><a href="{{ route('admin.users.coordinators') }}" class="block rounded-lg px-5 py-2 text-sm text-gray-700 hover:bg-gray-100">Koordinator</a></li>
-                <li><a href="{{ route('admin.users.departments') }}" class="block rounded-lg px-5 py-2 text-sm text-gray-700">Departemen</a></li>
-            </ul>
-        </div>
-    </li>
-    
-    <!-- Departemen & Program Kerja -->
-    <li>
-        <div class="relative">
-            <button onclick="toggleDropdown('deptMenu')" class="flex items-center space-x-4 rounded-xl px-5 py-3 text-gray-700 hover:bg-gray-100 w-full">
-                <i class="fas fa-building text-lg w-6"></i>
-                <span class="text-base font-semibold truncate max-w-[120px]">Departemen</span>
-                <i class="fas fa-chevron-down ml-auto text-xs"></i>
-            </button>
-            <ul id="deptMenu" class="hidden pl-10 mt-2 space-y-3">
-                <li><a href="{{ route('admin.departments.index') }}" class="block rounded-lg px-5 py-2 text-sm text-gray-700 hover:bg-gray-100">Kelola Departemen</a></li>
-                <li><a href="{{ route('admin.program-kerja.index') }}" class="block rounded-lg px-5 py-2 text-sm text-gray-700 hover:bg-gray-100">Program Kerja</a></li>
-            </ul>
-        </div>
-    </li>
-    
-    <!-- Event & Lowongan -->
-    <li>
-        <div class="relative">
-            <button onclick="toggleDropdown('eventMenu')" class="flex items-center space-x-4 rounded-xl px-5 py-3 text-gray-700 hover:bg-gray-100 w-full">
-                <i class="fas fa-calendar-alt text-lg w-6"></i>
-                <span class="text-base font-semibold truncate max-w-[120px]">Event & Lowongan</span>
-                <i class="fas fa-chevron-down ml-auto text-xs"></i>
-            </button>
-            <ul id="eventMenu" class="hidden pl-10 mt-2 space-y-3">
-                <li><a href="{{ route('admin.events.index') }}" class="block rounded-lg px-5 py-2 text-sm text-gray-700 hover:bg-gray-100">Kelola Event</a></li>
-                <li><a href="{{ route('admin.jobs.index') }}" class="block rounded-lg px-5 py-2 text-sm text-gray-700 hover:bg-gray-100">Lowongan Kerja</a></li>
-            </ul>
-        </div>
-    </li>
-    
-    <!-- Keuangan -->
-    <li>
-        <div class="relative">
-            <button onclick="toggleDropdown('financeMenu')" class="flex items-center space-x-4 rounded-xl px-5 py-3 text-gray-700 hover:bg-gray-100 w-full">
-                <i class="fas fa-coins text-lg w-6"></i>
-                <span class="text-base font-semibold truncate max-w-[120px]">Keuangan</span>
-                <i class="fas fa-chevron-down ml-auto text-xs"></i>
-            </button>
-            <ul id="financeMenu" class="hidden pl-10 mt-2 space-y-3">
-                <li><a href="{{ route('admin.finance.dues') }}" class="block rounded-lg px-5 py-2 text-sm text-gray-700 hover:bg-gray-100">Iuran Alumni</a></li>
-                <li><a href="{{ route('admin.finance.cashflow') }}" class="block rounded-lg px-5 py-2 text-sm text-gray-700 hover:bg-gray-100">Arus Kas</a></li>
-                <li><a href="{{ route('admin.finance.reports') }}" class="block rounded-lg px-5 py-2 text-sm text-gray-700 hover:bg-gray-100">Laporan</a></li>
-            </ul>
-        </div>
-    </li>
-    
-    <!-- Gallery -->
-    <li>
-        <a href="{{ route('admin.gallery.index') }}" class="flex items-center space-x-4 rounded-xl px-5 py-3 text-gray-700 hover:bg-gray-100">
-            <i class="fas fa-images text-lg w-6"></i>
-            <span class="text-base font-semibold truncate max-w-[120px]">Gallery</span>
-        </a>
-    </li>
-    
-    <!-- Laporan & Analitik -->
-    <li>
-        <a href="{{ route('admin.reports.index') }}" class="flex items-center space-x-4 rounded-xl px-5 py-3 text-gray-700 hover:bg-gray-100">
-            <i class="fas fa-chart-bar text-lg w-6"></i>
-            <span class="text-base font-semibold truncate max-w-[120px]">Laporan & Analitik</span>
-        </a>
-    </li>
-    
-    <!-- Pengaturan -->
-    <li>
-        <a href="{{ route('admin.settings.index') }}" class="flex items-center space-x-4 rounded-xl px-5 py-3 text-gray-700 hover:bg-gray-100">
-            <i class="fas fa-cog text-lg w-6"></i>
-            <span class="text-base font-semibold truncate max-w-[120px]">Pengaturan</span>
-        </a>
-    </li>
-</ul>
+    @include('admin.menu')
 @endsection
 
 @section('content')
@@ -331,19 +236,7 @@
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    // Toggle dropdown menu
-    function toggleDropdown(menuId) {
-        const menu = document.getElementById(menuId);
-        const allMenus = document.querySelectorAll('[id$="Menu"]');
-        
-        allMenus.forEach(m => {
-            if (m.id !== menuId) {
-                m.classList.add('hidden');
-            }
-        });
-        
-        menu.classList.toggle('hidden');
-    }
+    // Removed toggleDropdown function as menu now uses direct links
 
     // Alumni by Year Chart
     const alumniByYearCtx = document.getElementById('alumniByYearChart').getContext('2d');

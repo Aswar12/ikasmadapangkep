@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\AdminFinanceController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
@@ -158,7 +159,7 @@ Route::group(['middleware' => ['auth', 'role:admin'], 'prefix' => 'admin'], func
     Route::post('/payments/bulk-approve', [App\Http\Controllers\Admin\PaymentController::class, 'bulkApprove'])->name('admin.payments.bulk-approve');
     // Finance Management
     Route::get('/finance', function() { return view('admin.placeholder', ['title' => 'Keuangan']); })->name('admin.finance.index');
-    Route::get('/finance/dues', function() { return view('admin.placeholder', ['title' => 'Iuran Alumni']); })->name('admin.finance.dues');
+    Route::get('/finance/dues', [AdminFinanceController::class, 'duesDashboard'])->name('admin.finance.dues');
     Route::get('/finance/cashflow', function() { return view('admin.placeholder', ['title' => 'Arus Kas']); })->name('admin.finance.cashflow');
     Route::get('/finance/reports', function() { return view('admin.placeholder', ['title' => 'Laporan Keuangan']); })->name('admin.finance.reports');
     

@@ -4,7 +4,7 @@
         <div class="row">
             <div class="col-lg-4 col-md-6 mb-4 mb-lg-0">
                 <h5 class="footer-title">IKASMADA PANGKEP</h5>
-                <p>Ikatan Alumni SMA Negeri 1 Pangkajene dan Kepulauan. Menjalin silaturahmi dan membangun masa depan bersama.</p>
+                <p>Ikatan Alumni SMA Negeri 2 Pangkajene dan Kepulauan. Menjalin silaturahmi dan membangun masa depan bersama.</p>
                 <div class="social-icons">
                     <a href="#"><i class="fab fa-facebook-f"></i></a>
                     <a href="#"><i class="fab fa-twitter"></i></a>

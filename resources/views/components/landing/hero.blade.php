@@ -10,7 +10,7 @@
         <div class="row justify-content-center">
             <div class="col-md-10 hero-content" data-aos="fade-up">
                 <h1 class="hero-title">IKASMADA PANGKEP</h1>
-                <p class="hero-description mx-auto">Ikatan Alumni SMA Negeri 1 Pangkajene dan Kepulauan, menjalin silaturahmi dan membangun masa depan bersama.</p>
+                <p class="hero-description mx-auto">Ikatan Alumni SMA Negeri 2 Pangkajene dan Kepulauan, menjalin silaturahmi dan membangun masa depan bersama.</p>
                 <div class="hero-buttons">
                     <a href="{{ route('register') }}" class="btn hero-btn primary-btn">Daftar</a>
                     <a href="#alumni" class="btn hero-btn secondary-btn">Cari Alumni</a>
