@@ -16,7 +16,15 @@ class DepartmentController extends Controller
      */
     public function index()
     {
-        $departments = Department::with('coordinator')->get();
+        $user = auth()->user();
+        
+        // Get departments based on user access level
+        if ($user->canAccessAllDepartments()) {
+            $departments = Department::with(['coordinator', 'programKerja'])->get();
+        } else {
+            $departments = $user->getAccessibleDepartments()->load(['coordinator', 'programKerja']);
+        }
+        
         return view('admin.departments.index', compact('departments'));
     }
 

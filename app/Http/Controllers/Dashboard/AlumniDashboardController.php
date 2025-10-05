@@ -37,7 +37,7 @@ class AlumniDashboardController extends Controller
         // Untuk kompatibilitas dengan template
         $upcoming_events = $upcomingEvents;
         
-        // My registered events
+        // My events
         $myEvents = Event::whereHas('registrations', function ($query) use ($user) {
             $query->where('user_id', $user->id);
         })
@@ -47,7 +47,7 @@ class AlumniDashboardController extends Controller
         
         // Latest program kerja
         $latestPrograms = ProgramKerja::with('department')
-            ->where('status', 'in_progress')
+            ->where('status', 'ongoing')
             ->orderBy('updated_at', 'desc')
             ->take(5)
             ->get();

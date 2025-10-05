@@ -20,11 +20,17 @@ class AdminDashboardController extends Controller
             'total_alumni' => User::where('role', 'alumni')->count(),
             'alumni_aktif' => User::where('role', 'alumni')->where('status', 'active')->count(),
             'alumni_pending' => User::where('role', 'alumni')->where('status', 'pending')->count(),
+            'pending_approvals' => User::where('status', 'pending')->count(),
             'total_departments' => Department::count(),
             'total_events' => Event::count(),
             'upcoming_events' => Event::where('start_date', '>=', now())->count(),
             'total_program_kerja' => ProgramKerja::count(),
-            'program_kerja_aktif' => ProgramKerja::where('status', 'in_progress')->count(),
+            'program_kerja_aktif' => ProgramKerja::where('status', 'ongoing')->count(),
+            'program_kerja_completed' => ProgramKerja::where('status', 'completed')->count(),
+            'program_kerja_delayed' => ProgramKerja::where('status', 'delayed')->count(),
+            'pending_payments' => \App\Models\Payment::where('status', 'pending')->count(),
+            'verified_payments' => \App\Models\Payment::where('status', 'verified')->count(),
+            'total_revenue' => \App\Models\Payment::where('status', 'verified')->sum('amount'),
         ];
 
         // Alumni berdasarkan tahun kelulusan
@@ -81,7 +87,7 @@ class AdminDashboardController extends Controller
         $departmentStats = Department::withCount([
             'programKerja',
             'programKerja as active_programs_count' => function ($query) {
-                $query->where('status', 'in_progress');
+                $query->where('status', 'ongoing');
             }
         ])->get();
 

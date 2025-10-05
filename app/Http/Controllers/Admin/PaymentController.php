@@ -44,12 +44,11 @@ class PaymentController extends Controller
 
         // Get statistics
         $statistics = [
-            'total' => Payment::count(),
-            'pending' => Payment::pending()->count(),
-            'waiting' => Payment::waitingVerification()->count(),
-            'verified' => Payment::verified()->count(),
-            'rejected' => Payment::rejected()->count(),
-            'total_amount' => Payment::verified()->sum('amount')
+            'total_payments' => Payment::count(),
+            'pending_payments' => Payment::where('status', 'pending')->count(),
+            'verified_payments' => Payment::where('status', 'verified')->count(),
+            'rejected_payments' => Payment::where('status', 'rejected')->count(),
+            'total_amount' => Payment::where('status', 'verified')->sum('amount')
         ];
 
         // Get available years for filter
@@ -197,6 +196,53 @@ class PaymentController extends Controller
         // This is a placeholder for export functionality
         // You can implement CSV/Excel export here
         return redirect()->back()->with('info', 'Fitur export akan segera tersedia.');
+    }
+
+    /**
+     * Bulk reject payments
+     */
+    public function bulkReject(Request $request)
+    {
+        $request->validate([
+            'payment_ids' => 'required|array',
+            'payment_ids.*' => 'exists:payments,id',
+            'rejection_reason' => 'required|string|max:500'
+        ]);
+
+        DB::beginTransaction();
+        try {
+            $payments = Payment::whereIn('id', $request->payment_ids)
+                             ->where('status', 'pending')
+                             ->get();
+
+            foreach ($payments as $payment) {
+                $payment->update([
+                    'status' => 'rejected',
+                    'verified_by' => Auth::id(),
+                    'verified_at' => now(),
+                    'rejection_reason' => $request->rejection_reason
+                ]);
+
+                $this->createNotification(
+                    $payment->user_id,
+                    'Pembayaran Ditolak',
+                    'Pembayaran iuran tahun ' . $payment->year . ' ditolak. Alasan: ' . $request->rejection_reason
+                );
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Berhasil menolak ' . count($payments) . ' pembayaran.'
+            ]);
+        } catch (\Exception $e) {
+            DB::rollback();
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan saat melakukan aksi massal.'
+            ], 500);
+        }
     }
 
     /**

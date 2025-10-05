@@ -81,7 +81,7 @@
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Peran</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal Daftar</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
+                        <th class="px-8 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
@@ -92,8 +92,8 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="flex items-center">
-                                <div class="flex-shrink-0 h-10 w-10">
-                                    <img class="h-10 w-10 rounded-full" src="{{ $user->profile_photo_url ?? asset('images/default-avatar.png') }}" alt="">
+                                <div class="flex-shrink-0 h-14 w-14">
+                                    <img class="h-14 w-14 rounded-full object-cover border-2 border-gray-200" src="{{ $user->profile_photo_url ?? asset('images/default-avatar.png') }}" alt="">
                                 </div>
                                 <div class="ml-4">
                                     <div class="text-sm font-medium text-gray-900">{{ $user->name }}</div>
@@ -140,20 +140,20 @@
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                             {{ $user->created_at->format('d M Y') }}
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                            <div class="flex items-center space-x-3">
-                                <a href="{{ route('admin.users.edit', $user->id) }}" class="text-indigo-600 hover:text-indigo-900">
+                        <td class="px-8 py-6 whitespace-nowrap text-sm font-medium">
+                            <div class="flex items-center space-x-4">
+                                <a href="{{ route('admin.users.edit', $user->id) }}" class="text-indigo-600 hover:text-indigo-900 p-2 rounded-lg hover:bg-indigo-50 transition-colors duration-200" title="Edit">
                                     <i class="fas fa-edit"></i>
                                 </a>
                                 @if($user->status === 'pending')
-                                    <button type="button" onclick="approveUser({{ $user->id }})" class="text-green-600 hover:text-green-900">
+                                    <button type="button" onclick="approveUser({{ $user->id }})" class="text-green-600 hover:text-green-900 p-2 rounded-lg hover:bg-green-50 transition-colors duration-200" title="Approve">
                                         <i class="fas fa-check"></i>
                                     </button>
-                                    <button type="button" onclick="rejectUser({{ $user->id }})" class="text-red-600 hover:text-red-900">
+                                    <button type="button" onclick="rejectUser({{ $user->id }})" class="text-red-600 hover:text-red-900 p-2 rounded-lg hover:bg-red-50 transition-colors duration-200" title="Reject">
                                         <i class="fas fa-times"></i>
                                     </button>
                                 @endif
-                                <button type="button" onclick="deleteUser({{ $user->id }})" class="text-red-600 hover:text-red-900">
+                                <button type="button" onclick="deleteUser({{ $user->id }})" class="text-red-600 hover:text-red-900 p-2 rounded-lg hover:bg-red-50 transition-colors duration-200" title="Delete">
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </div>

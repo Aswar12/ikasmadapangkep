@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\AdminFinanceController;
+use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
@@ -35,11 +36,7 @@ Route::group(['middleware' => 'guest'], function () {
     Route::get('register', [RegisterController::class, 'showRegistrationForm'])->name('register');
     Route::post('register', [RegisterController::class, 'register']);
     
-    // Password Reset Routes
-    Route::get('password/reset', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
-    Route::post('password/email', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
-    Route::get('password/reset/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
-    Route::post('password/reset', [ResetPasswordController::class, 'reset'])->name('password.update');
+    // Password Reset Routes are handled by Fortify
 });
 
 // Logout Route
@@ -126,22 +123,41 @@ Route::group(['middleware' => ['auth', 'role:admin'], 'prefix' => 'admin'], func
     // Route::delete('/departments/{department}', [App\Http\Controllers\Admin\UserController::class, 'destroyDepartment'])->name('admin.departments.destroy'); // Now handled by DepartmentController
 
     // Department Management (using DepartmentController)
+    Route::get('/departments/dashboard', [App\Http\Controllers\Admin\DepartmentDashboardController::class, 'overview'])->name('admin.departments.dashboard');
+    Route::get('/departments/performance-data', [App\Http\Controllers\Admin\DepartmentDashboardController::class, 'performanceData'])->name('admin.departments.performance-data');
+    Route::get('/departments/available-coordinators', [App\Http\Controllers\Admin\DepartmentDashboardController::class, 'getAvailableCoordinators'])->name('admin.departments.available-coordinators')->middleware('department.access:admin');
+    Route::put('/departments/{department}/assign-coordinator-new', [App\Http\Controllers\Admin\DepartmentDashboardController::class, 'assignCoordinator'])->name('admin.departments.assign-coordinator-new')->middleware('department.access:admin');
+    Route::delete('/departments/{department}/remove-coordinator', [App\Http\Controllers\Admin\DepartmentDashboardController::class, 'removeCoordinator'])->name('admin.departments.remove-coordinator')->middleware('department.access:admin');
+    
     Route::get('/departments', [App\Http\Controllers\Admin\DepartmentController::class, 'index'])->name('admin.departments.index');
-    Route::get('/departments/create', [App\Http\Controllers\Admin\DepartmentController::class, 'create'])->name('admin.departments.create');
-    Route::post('/departments', [App\Http\Controllers\Admin\DepartmentController::class, 'store'])->name('admin.departments.store');
-    Route::get('/departments/{department}/edit', [App\Http\Controllers\Admin\DepartmentController::class, 'edit'])->name('admin.departments.edit');
-    Route::put('/departments/{department}', [App\Http\Controllers\Admin\DepartmentController::class, 'update'])->name('admin.departments.update');
-    Route::delete('/departments/{department}', [App\Http\Controllers\Admin\DepartmentController::class, 'destroy'])->name('admin.departments.destroy');
-    Route::get('/departments/{department}', function() { return view('admin.placeholder', ['title' => 'Detail Departemen']); })->name('admin.departments.show');
+    Route::get('/departments/create', [App\Http\Controllers\Admin\DepartmentController::class, 'create'])->name('admin.departments.create')->middleware('department.access:admin');
+    Route::post('/departments', [App\Http\Controllers\Admin\DepartmentController::class, 'store'])->name('admin.departments.store')->middleware('department.access:admin');
+    Route::get('/departments/{department}/edit', [App\Http\Controllers\Admin\DepartmentController::class, 'edit'])->name('admin.departments.edit')->middleware('department.access:manage');
+    Route::put('/departments/{department}', [App\Http\Controllers\Admin\DepartmentController::class, 'update'])->name('admin.departments.update')->middleware('department.access:manage');
+    Route::delete('/departments/{department}', [App\Http\Controllers\Admin\DepartmentController::class, 'destroy'])->name('admin.departments.destroy')->middleware('department.access:admin');
+    Route::get('/departments/{department}', [App\Http\Controllers\Admin\DepartmentDashboardController::class, 'show'])->name('admin.departments.show')->middleware('department.access:view');
     
     // Program Kerja Management
-    // Program Kerja Management
+    Route::get('/program-kerja/dashboard', [App\Http\Controllers\Admin\ProgramKerjaController::class, 'dashboard'])->name('admin.program-kerja.dashboard');
+    Route::get('/program-kerja/kanban', [App\Http\Controllers\Admin\ProgramKerjaController::class, 'kanban'])->name('admin.program-kerja.kanban');
+    Route::get('/program-kerja/calendar', [App\Http\Controllers\Admin\ProgramKerjaController::class, 'calendar'])->name('admin.program-kerja.calendar');
     Route::get('/program-kerja', [App\Http\Controllers\Admin\ProgramKerjaController::class, 'index'])->name('admin.program-kerja.index');
     Route::get('/program-kerja/create', [App\Http\Controllers\Admin\ProgramKerjaController::class, 'create'])->name('admin.program-kerja.create');
     Route::post('/program-kerja', [App\Http\Controllers\Admin\ProgramKerjaController::class, 'store'])->name('admin.program-kerja.store');
+    Route::get('/program-kerja/{programKerja}', [App\Http\Controllers\Admin\ProgramKerjaController::class, 'show'])->name('admin.program-kerja.show');
     Route::get('/program-kerja/{programKerja}/edit', [App\Http\Controllers\Admin\ProgramKerjaController::class, 'edit'])->name('admin.program-kerja.edit');
     Route::put('/program-kerja/{programKerja}', [App\Http\Controllers\Admin\ProgramKerjaController::class, 'update'])->name('admin.program-kerja.update');
     Route::delete('/program-kerja/{programKerja}', [App\Http\Controllers\Admin\ProgramKerjaController::class, 'destroy'])->name('admin.program-kerja.destroy');
+    
+    // AJAX Routes for Kanban
+    Route::patch('/program-kerja/{programKerja}/update-status', [App\Http\Controllers\Admin\ProgramKerjaController::class, 'updateStatus'])->name('admin.program-kerja.update-status');
+    Route::patch('/program-kerja/{programKerja}/update-progress', [App\Http\Controllers\Admin\ProgramKerjaController::class, 'updateProgress'])->name('admin.program-kerja.update-progress');
+    Route::post('/program-kerja/{programKerja}/add-note', [App\Http\Controllers\Admin\ProgramKerjaController::class, 'addNote'])->name('admin.program-kerja.add-note');
+    Route::get('/program-kerja/statistics', [App\Http\Controllers\Admin\ProgramKerjaController::class, 'getKanbanStatistics'])->name('admin.program-kerja.statistics');
+    
+    // Calendar specific routes
+    Route::get('/program-kerja/{programKerja}/details', [App\Http\Controllers\Admin\ProgramKerjaController::class, 'getProgramDetails'])->name('admin.program-kerja.details');
+    Route::get('/program-kerja/export-calendar', [App\Http\Controllers\Admin\ProgramKerjaController::class, 'exportCalendar'])->name('admin.program-kerja.export-calendar');
     // Consider adding PATCH as well if partial updates are desired: Route::patch('/program-kerja/{programKerja}', [App\Http\Controllers\Admin\ProgramKerjaController::class, 'update']);
     
     // Event Management
@@ -157,6 +173,7 @@ Route::group(['middleware' => ['auth', 'role:admin'], 'prefix' => 'admin'], func
     Route::post('/payments/{payment}/approve', [App\Http\Controllers\Admin\PaymentController::class, 'approve'])->name('admin.payments.approve');
     Route::post('/payments/{payment}/reject', [App\Http\Controllers\Admin\PaymentController::class, 'reject'])->name('admin.payments.reject');
     Route::post('/payments/bulk-approve', [App\Http\Controllers\Admin\PaymentController::class, 'bulkApprove'])->name('admin.payments.bulk-approve');
+    Route::post('/payments/bulk-reject', [App\Http\Controllers\Admin\PaymentController::class, 'bulkReject'])->name('admin.payments.bulk-reject');
     // Finance Management
     Route::get('/finance', function() { return view('admin.placeholder', ['title' => 'Keuangan']); })->name('admin.finance.index');
     Route::get('/finance/dues', [AdminFinanceController::class, 'duesDashboard'])->name('admin.finance.dues');
@@ -167,17 +184,22 @@ Route::group(['middleware' => ['auth', 'role:admin'], 'prefix' => 'admin'], func
     Route::get('/gallery', function() { return view('admin.placeholder', ['title' => 'Galeri']); })->name('admin.gallery.index');
     
     // Reports & Analytics
-    Route::get('/reports', function() { return view('admin.placeholder', ['title' => 'Laporan']); })->name('admin.reports.index');
-    Route::get('/reports/export', function() { return view('admin.placeholder', ['title' => 'Export Data']); })->name('admin.reports.export');
+    Route::get('/reports', [App\Http\Controllers\Admin\ReportController::class, 'department'])->name('admin.reports.index');
+    Route::get('/reports/department', [App\Http\Controllers\Admin\ReportController::class, 'department'])->name('admin.reports.department');
+    Route::get('/reports/program-kerja', [App\Http\Controllers\Admin\ReportController::class, 'programKerja'])->name('admin.reports.program-kerja');
+    Route::get('/reports/finance', [App\Http\Controllers\Admin\ReportController::class, 'finance'])->name('admin.reports.finance');
+    Route::get('/reports/export-finance', [App\Http\Controllers\Admin\ReportController::class, 'exportFinance'])->name('admin.reports.export-finance');
     
     // Settings
     Route::get('/settings', function() { return view('admin.placeholder', ['title' => 'Pengaturan']); })->name('admin.settings.index');
 });
 
 // Coordinator Routes
-Route::group(['middleware' => ['auth', 'role:coordinator'], 'prefix' => 'coordinator', 'as' => 'coordinator.'], function () {
-    // Dashboard (example, can be added later)
-    // Route::get('/dashboard', [App\Http\Controllers\Dashboard\CoordinatorDashboardController::class, 'index'])->name('dashboard');
+Route::group(['middleware' => ['auth', 'role:department_coordinator'], 'prefix' => 'coordinator', 'as' => 'coordinator.'], function () {
+    // Department Dashboard for Coordinator
+    Route::get('/dashboard', [App\Http\Controllers\Coordinator\DepartmentController::class, 'dashboard'])->name('dashboard');
+    Route::get('/department', [App\Http\Controllers\Coordinator\DepartmentController::class, 'show'])->name('department.show');
+    Route::get('/programs', [App\Http\Controllers\Coordinator\DepartmentController::class, 'programs'])->name('programs.index');
 
     // Program Kerja Management for Coordinator
     Route::get('/program-kerja', [App\Http\Controllers\Coordinator\ProgramKerjaController::class, 'index'])->name('program-kerja.index');
@@ -187,5 +209,4 @@ Route::group(['middleware' => ['auth', 'role:coordinator'], 'prefix' => 'coordin
     Route::put('/program-kerja/{programKerja}', [App\Http\Controllers\Coordinator\ProgramKerjaController::class, 'update'])->name('program-kerja.update');
     Route::delete('/program-kerja/{programKerja}', [App\Http\Controllers\Coordinator\ProgramKerjaController::class, 'destroy'])->name('program-kerja.destroy');
     Route::post('/program-kerja/{programKerja}/store-update', [App\Http\Controllers\Coordinator\ProgramKerjaController::class, 'storeUpdate'])->name('program-kerja.storeUpdate');
-    // Add other Program Kerja routes for coordinator here (e.g., show, updates)
 });

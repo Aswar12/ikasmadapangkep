@@ -1,44 +1,66 @@
+version: '3.8'
+
 services:
   app:
     build:
       context: .
       dockerfile: Dockerfile
-    ports:
-      - "8000:80"
+    image: ikasmadapangkep-app
+    container_name: ikasmadapangkep-app
+    restart: unless-stopped
+    working_dir: /var/www
     volumes:
-      - .:/var/www/html
-    depends_on:
-      - db
+      - ./:/var/www
     environment:
-      - APP_ENV=local
-      - DB_CONNECTION=mysql
       - DB_HOST=db
-      - DB_PORT=3306
       - DB_DATABASE=laravel
       - DB_USERNAME=root
       - DB_PASSWORD=root
+    depends_on:
+      - db
+    ports:
+      - "9000:9000"
+    networks:
+      - laravel-network
+
+  webserver:
+    image: nginx:alpine
+    container_name: ikasmadapangkep-nginx
+    restart: unless-stopped
+    ports:
+      - "8000:80"
+      - "443:443"
+    volumes:
+      - ./:/var/www
+      - ./docker/nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - app
     networks:
       - laravel-network
 
   db:
     image: mysql:8.0
+    container_name: ikasmadapangkep-db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: laravel
+      MYSQL_ROOT_PASSWORD: root
     ports:
       - "3306:3306"
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: laravel
-      MYSQL_USER: laravel
-      MYSQL_PASSWORD: password
     volumes:
       - mysql_data:/var/lib/mysql
     networks:
       - laravel-network
 
-  cloudflare:
+  cloudflared:
     image: cloudflare/cloudflared:latest
-    command: tunnel --no-autoupdate run --token eyJhIjoiNjE1NzhkZDhiMzMxNzYyMzNlNGM3ZjI5MDYwMmJmMzUiLCJ0IjoiYzVhNzU2ODEtMDE2Zi00MDQ3LWEyMGQtZGVhOWNhOWIwMWFhIiwicyI6Ik16YzBNRGxqTVRZdFl6UmtOaTAwWVdNMUxUa3lZMll0WW1WaFlXVTNaakJsTkRBeiJ9 --url http://app:80
+    container_name: ikasmadapangkep-cloudflared
+    command: tunnel --no-autoupdate run --token eyJhIjoiNjE1NzhkZDhiMzMxNzYyMzNlNGM3ZjI5MDYwMmJmMzUiLCJ0IjoiYzVhNzU2ODEtMDE2Zi00MDQ3LWEyMGQtZGVhOWNhOWIwMWFhIiwicyI6Ik16YzBNRGxqTVRZdFl6UmtOaTAwWVdNMUxUa3lZMll0WW1WaFlXVTNaakJsTkRBeiJ9
+    environment:
+      - TUNNEL_URL=http://webserver:80
+    restart: unless-stopped
     depends_on:
-      - app
+      - webserver
     networks:
       - laravel-network
 

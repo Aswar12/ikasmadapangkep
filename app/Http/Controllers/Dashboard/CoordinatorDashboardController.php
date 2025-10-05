@@ -35,7 +35,7 @@ class CoordinatorDashboardController extends Controller
         $stats = [
             'total_programs' => $myProgramKerja->count(),
             'planning' => $myProgramKerja->where('status', 'planning')->count(),
-            'in_progress' => $myProgramKerja->where('status', 'in_progress')->count(),
+            'in_progress' => $myProgramKerja->where('status', 'ongoing')->count(),
             'completed' => $myProgramKerja->where('status', 'completed')->count(),
             'delayed' => $myProgramKerja->where('status', 'delayed')->count(),
             'total_budget' => $myProgramKerja->sum('budget'),
@@ -45,7 +45,7 @@ class CoordinatorDashboardController extends Controller
         // Program kerja by status
         $programsByStatus = [
             'planning' => $myProgramKerja->where('status', 'planning'),
-            'in_progress' => $myProgramKerja->where('status', 'in_progress'),
+            'in_progress' => $myProgramKerja->where('status', 'ongoing'),
             'completed' => $myProgramKerja->where('status', 'completed'),
             'delayed' => $myProgramKerja->where('status', 'delayed'),
         ];
@@ -127,7 +127,7 @@ class CoordinatorDashboardController extends Controller
         if ($request->progress_percentage == 100) {
             $program->status = 'completed';
         } elseif ($request->progress_percentage > 0) {
-            $program->status = 'in_progress';
+            $program->status = 'ongoing';
         }
         
         $program->save();

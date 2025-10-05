@@ -28,6 +28,8 @@ class DashboardController extends Controller
                 ->where('email_verified_at', '!=', null)
                 ->count(),
             'program_kerja_aktif' => ProgramKerja::where('status', 'ongoing')->count(),
+            'total_departments' => \App\Models\Department::count(),
+            'total_events' => Event::count(),
             'completed_programs_this_month' => ProgramKerja::where('status', 'completed')
                 ->whereMonth('updated_at', now()->month)
                 ->count(),

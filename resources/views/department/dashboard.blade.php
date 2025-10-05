@@ -66,7 +66,7 @@
                                     <p class="mb-4">Programs in Progress: 
                                         <span class="font-semibold">
                                             {{ \App\Models\ProgramKerja::where('department_id', auth()->user()->department_id)
-                                                ->where('status', 'in_progress')->count() }}
+                                                ->where('status', 'ongoing')->count() }}
                                         </span>
                                     </p>
                                 </div>

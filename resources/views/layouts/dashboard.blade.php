@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://fonts.bunny.net;">
 
     <title>{{ config('app.name', 'IKA SMADA Pangkep') }} - Dashboard</title>
 
@@ -25,8 +26,27 @@
         /* Reset untuk sidebar */
         aside {
             z-index: 40 !important;
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            height: 100vh !important;
+            overflow-y: auto !important;
         }
-        
+
+        /* Desktop sidebar */
+        aside:not(#mobileSidebar) {
+            transform: none !important;
+        }
+
+        /* Mobile sidebar */
+        #mobileSidebar {
+            transform: translateX(-100%) !important;
+        }
+
+        #mobileSidebar.show {
+            transform: translateX(0) !important;
+        }
+
         /* Pastikan link dapat diklik */
         aside a {
             cursor: pointer !important;
@@ -34,22 +54,111 @@
             position: relative !important;
             z-index: 50 !important;
         }
-        
-        /* Hapus overlay yang tidak perlu */
-        aside::before,
-        aside::after {
-            display: none !important;
+
+        /* Main content positioning */
+        .md\:ml-64 {
+            margin-left: 16rem !important; /* 256px = 16rem */
+            position: relative !important;
+            z-index: 10 !important;
+            min-height: 100vh !important;
         }
-        
-        /* Mobile overlay dengan z-index lebih rendah */
+
+        /* Mobile content */
+        @media (max-width: 768px) {
+            .md\:ml-64 {
+                margin-left: 0 !important;
+            }
+
+            aside:not(#mobileSidebar) {
+                display: none !important;
+            }
+        }
+
+        /* Sidebar overlay */
         #sidebarOverlay {
             z-index: 30 !important;
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            background-color: rgba(0, 0, 0, 0.5) !important;
+            opacity: 0 !important;
+            visibility: hidden !important;
+            transition: opacity 0.3s ease, visibility 0.3s ease !important;
         }
-        
-        /* Main content z-index */
-        .md\:ml-64 {
+
+        #sidebarOverlay.show {
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
+
+        /* Ensure content is not covered */
+        main {
+            min-height: calc(100vh - 200px);
+        }
+
+        /* Better spacing for dashboard content */
+        .space-y-6 > * + * {
+            margin-top: 1.5rem;
+        }
+
+        /* Fix for any potential overflow */
+        body {
+            overflow-x: hidden;
+        }
+
+        /* Dashboard specific improvements */
+        .dashboard-grid {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        /* Statistics cards responsive */
+        @media (max-width: 640px) {
+            .grid-cols-6 {
+                grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .grid-cols-6 {
+                grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
+            }
+        }
+
+        /* Chart containers */
+        .chart-container {
             position: relative;
-            z-index: 10;
+            height: 250px;
+        }
+
+        /* Better table styling */
+        .dashboard-table th {
+            background-color: #f9fafb;
+            font-weight: 600;
+            text-align: left;
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .dashboard-table td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .dashboard-table tr:hover {
+            background-color: #f9fafb;
+        }
+
+        /* Quick action cards */
+        .quick-action-card {
+            transition: all 0.2s ease;
+        }
+
+        .quick-action-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
     </style>
     
@@ -117,9 +226,9 @@
         </div>
 
         <!-- Main Content -->
-        <div class="md:ml-64 p-4 md:p-8" style="position: relative; z-index: 10;">
+        <div class="md:ml-64 p-4 md:p-6 min-h-screen" style="position: relative; z-index: 10;">
             <!-- Top Navigation -->
-            <nav class="bg-white shadow-sm rounded-xl p-4 mb-6">
+            <nav class="bg-white shadow-sm rounded-lg p-4 mb-6">
                 <div class="flex justify-between items-center">
                     <div>
                         <h2 class="text-xl font-bold text-gray-800">@yield('page-title', 'Dashboard')</h2>
@@ -139,7 +248,7 @@
             </nav>
 
             <!-- Content -->
-            <main class="bg-white shadow-sm rounded-xl p-6">
+            <main class="space-y-6">
                 @yield('content')
             </main>
         </div>
@@ -151,40 +260,40 @@
     function toggleSidebar() {
         const mobileSidebar = document.getElementById('mobileSidebar');
         const overlay = document.getElementById('sidebarOverlay');
-        
-        if (mobileSidebar.classList.contains('-translate-x-full')) {
-            // Show sidebar
-            mobileSidebar.classList.remove('-translate-x-full');
-            overlay.classList.remove('hidden');
-        } else {
+
+        if (mobileSidebar.classList.contains('show')) {
             // Hide sidebar
-            mobileSidebar.classList.add('-translate-x-full');
-            overlay.classList.add('hidden');
+            mobileSidebar.classList.remove('show');
+            overlay.classList.remove('show');
+        } else {
+            // Show sidebar
+            mobileSidebar.classList.add('show');
+            overlay.classList.add('show');
         }
     }
 
     // Close sidebar when clicking overlay
     document.getElementById('sidebarOverlay').addEventListener('click', toggleSidebar);
-    
+
+    // Close sidebar when clicking a menu item (mobile)
+    document.querySelectorAll('#mobileSidebar a').forEach(link => {
+        link.addEventListener('click', toggleSidebar);
+    });
+
     // Debug function untuk check clickability
     function debugMenuClicks() {
         const links = document.querySelectorAll('aside a');
         console.log('Total menu links found:', links.length);
-        
+
         links.forEach((link, index) => {
             console.log(`Link ${index}:`, {
                 href: link.href,
                 clickable: window.getComputedStyle(link).pointerEvents !== 'none',
                 zIndex: window.getComputedStyle(link).zIndex
             });
-            
-            // Test click
-            link.addEventListener('click', function(e) {
-                console.log('Menu clicked:', this.href);
-            });
         });
     }
-    
+
     // Run debug on page load
     window.addEventListener('load', debugMenuClicks);
     </script>

@@ -25,9 +25,11 @@ class ProgramKerja extends Model
         'end_date',
         'location',
         'budget',
+        'realization',
+        'pic_id',
+        'progress',
         'status',
-        'progress_percentage',
-        'current_progress'
+        'notes'
     ];
 
     /**
@@ -39,7 +41,8 @@ class ProgramKerja extends Model
         'start_date' => 'date',
         'end_date' => 'date',
         'budget' => 'decimal:2',
-        'progress_percentage' => 'integer',
+        'realization' => 'decimal:2',
+        'progress' => 'integer',
     ];
 
     /**
@@ -61,8 +64,8 @@ class ProgramKerja extends Model
     /**
      * Get the PIC user for the program.
      */
-    public function picUser()
+    public function pic()
     {
-        return $this->belongsTo(User::class, 'pic_user_id');
+        return $this->belongsTo(User::class, 'pic_id');
     }
 }

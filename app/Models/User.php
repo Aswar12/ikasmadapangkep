@@ -285,18 +285,162 @@ class User extends Authenticatable
     {
         return $this->hasMany(Department::class, 'coordinator_id');
     }
+
+    /**
+     * Get the primary department that this user coordinates (for single coordinator).
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function coordinatedDepartment()
+    {
+        return $this->hasOne(Department::class, 'coordinator_id');
+    }
     
     /**
+     * Get the department memberships for this user.
+     */
+    public function departmentMemberships()
+    {
+        return $this->hasMany(DepartmentMember::class);
+    }
+
+    /**
      * Get the departments that this user belongs to.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
     public function departments()
     {
-        return $this->belongsToMany(Department::class, 'user_departments')
-                    ->withPivot('role_in_department')
+        return $this->belongsToMany(Department::class, 'department_members')
+                    ->withPivot('role_in_department', 'status', 'joined_at', 'resigned_at', 'notes')
                     ->withTimestamps();
     }
+
+    /**
+     * Get active department memberships.
+     */
+    public function activeDepartmentMemberships()
+    {
+        return $this->departmentMemberships()->active();
+    }
+
+    /**
+     * Check if user can access all departments (admin/sub_admin)
+     */
+    public function canAccessAllDepartments()
+    {
+        return in_array($this->role, ['admin', 'sub_admin']);
+    }
+
+    /**
+     * Check if user is department coordinator
+     */
+    public function isDepartmentCoordinator()
+    {
+        return $this->role === 'department_coordinator' && $this->coordinatedDepartment;
+    }
+
+    /**
+     * Get departments this user can manage
+     */
+    public function getAccessibleDepartments()
+    {
+        if ($this->canAccessAllDepartments()) {
+            return Department::all();
+        }
+        
+        if ($this->isDepartmentCoordinator()) {
+            return collect([$this->coordinatedDepartment]);
+        }
+        
+        return collect(); // Alumni get empty collection for now
+    }
+
+    /**
+     * Check if user can manage specific department
+     */
+    public function canManageDepartment($departmentId)
+    {
+        if ($this->canAccessAllDepartments()) {
+            return true;
+        }
+        
+        // Check if user is coordinator via main role
+        if ($this->isDepartmentCoordinator()) {
+            return $this->coordinatedDepartment && $this->coordinatedDepartment->id == $departmentId;
+        }
+        
+        // Check if user is coordinator via department membership
+        $membership = $this->departmentMemberships()
+            ->where('department_id', $departmentId)
+            ->where('role_in_department', 'coordinator')
+            ->where('status', 'active')
+            ->first();
+            
+        return $membership !== null;
+    }
+
+    /**
+     * Check if user can view specific department (read access)
+     */
+    public function canViewDepartment($departmentId)
+    {
+        if ($this->canAccessAllDepartments()) {
+            return true;
+        }
+        
+        if ($this->canManageDepartment($departmentId)) {
+            return true;
+        }
+        
+        // Check if user is member of the department
+        $membership = $this->departmentMemberships()
+            ->where('department_id', $departmentId)
+            ->where('status', 'active')
+            ->first();
+            
+        return $membership !== null;
+    }
+
+    /**
+     * Get user's role in specific department
+     */
+    public function getRoleInDepartment($departmentId)
+    {
+        // Check main coordinator role first
+        if ($this->isDepartmentCoordinator() && 
+            $this->coordinatedDepartment && 
+            $this->coordinatedDepartment->id == $departmentId) {
+            return 'coordinator';
+        }
+        
+        // Check department membership
+        $membership = $this->departmentMemberships()
+            ->where('department_id', $departmentId)
+            ->where('status', 'active')
+            ->first();
+            
+        return $membership ? $membership->role_in_department : null;
+    }
+
+    /**
+     * Check if user is executive in any department
+     */
+    public function isExecutiveInAnyDepartment()
+    {
+        if ($this->canAccessAllDepartments()) {
+            return true;
+        }
+        
+        if ($this->isDepartmentCoordinator()) {
+            return true;
+        }
+        
+        return $this->departmentMemberships()
+            ->whereIn('role_in_department', ['coordinator', 'secretary', 'treasurer'])
+            ->where('status', 'active')
+            ->exists();
+    }
+
+
     
     /**
      * Get the URL to the user's profile photo.
